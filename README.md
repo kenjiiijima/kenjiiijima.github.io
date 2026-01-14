@@ -7,3 +7,6 @@ GitHub Pages を用いて、広告なし・無料で公開しています。
 ## 記事
 
 - [本当に使えるGitHubの立ち上げ方](github-pages-start.md)
+---
+
+[このサイトの構成について](start-github-pages.md)
