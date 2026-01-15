@@ -1,5 +1,9 @@
-# 年表（実験用トップ）
+# 実験用トップ
 
-- 年表を見る → [timeline](timeline.html)
+このリポジトリは実験中です。
 
-<!-- 古典書房：画面上に名称を出さない方針。ここも語らない。 -->
+- 年表（Markdown / 内容確認用）  
+  → [timeline.md](timeline.md)
+
+- 年表（HTML / 表示・挙動確認用）  
+  → [timeline.html](timeline.html)
