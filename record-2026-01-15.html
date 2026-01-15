@@ -13,6 +13,7 @@
       --human: rgba(0,0,0,0.78); /* 対話者：薄め */
       --ai:    rgba(0,0,0,0.90); /* AI：濃いめ */
     }
+
     html, body { margin:0; background: var(--bg); }
     body{
       font-family: system-ui, -apple-system, "Segoe UI",
@@ -21,52 +22,51 @@
       letter-spacing: 0.01em;
       color: var(--text);
     }
+
+    /* 横長でも読みやすい“行の長さ”を強制する */
     main{
-      max-width: 880px;
+      max-width: 640px;          /* ←ここが重要：行を短くする */
       margin: 0 auto;
-      padding: 56px 22px 88px;
+      padding: 44px 18px 72px;   /* 上下左右の余白も少し詰める */
     }
 
-    /* 冒頭（対話ではない部分） */
+    /* 冒頭（対話でない部分） */
     .preamble{
-      font-size: 14px;
-      line-height: 1.7;
+      font-size: 13px;
+      line-height: 1.45;         /* ←行間を狭く */
       color: var(--muted);
     }
-    .preamble p{ margin: 0 0 10px; }
+    .preamble p{ margin: 0 0 6px; }
     .preamble strong{ color: var(--text); font-weight: 600; }
 
     hr{
       border: none;
       border-top: 1px solid var(--rule);
-      margin: 18px 0 22px;
+      margin: 14px 0 18px;
     }
 
-    /* ログ（可読性特化） */
+    /* ログ（可読性特化：行間を狭める） */
     .log{
-      font-size: 16px;
-      line-height: 1.55;
+      font-size: 15.5px;
+      line-height: 1.42;         /* ←行間を狭く（読みやすさ優先） */
     }
 
-    /* 発話ブロック：切り替わりだけ余白を強める */
+    /* 発話の切り替わりだけ余白を少し強める */
     .turn{
-      margin-top: 1.45em; /* 切替強調 */
+      margin-top: 1.05em;        /* ←広すぎない程度に */
     }
     .turn:first-child{ margin-top: 0; }
 
-    /* 話者ラベル：本文との間隔を少し広げる */
+    /* 話者ラベル：本文との間隔は少しだけ空ける */
     .speaker{
-      margin-bottom: 0.48em;
+      margin-bottom: 0.28em;     /* ←ラベルと本文の距離（控えめ） */
       font-weight: 600;
       letter-spacing: 0.02em;
     }
 
-    /* 本文段落 */
-    .turn p{
-      margin: 0;
-    }
+    .turn p{ margin: 0; }
 
-    /* 濃淡による識別（色相は変えない） */
+    /* 濃淡：対話者（薄）／AI（濃） */
     .speaker-human .speaker,
     .speaker-human p{ color: var(--human); }
 
@@ -76,7 +76,7 @@
     /* 戻る */
     a.back{
       display: inline-block;
-      margin-top: 36px;
+      margin-top: 26px;
       font-size: 13px;
       color: var(--muted);
       text-decoration: none;
@@ -90,21 +90,20 @@
 <body>
   <main>
 
-    <!-- 冒頭の文章（最終版） -->
+    <!-- 冒頭文：ご指定どおりに修正 -->
     <div class="preamble">
       <p>
-        これは、本ホームページのトップページ仕様を定める過程において行われた、<strong>ChatGPT 5.2</strong> と <strong>飯島健二</strong> との対話の記録である。
+        これは、本ホームページのトップページの仕様を決める際に行った、<strong>ChatGPT 5.2</strong> と私（飯島）との対話の記録である。
       </p>
       <p>
-        本文中、<strong>AI（ChatGPT 5.2）の発言は一切改変していない</strong>。対話者（飯島健二）の発言については、<strong>意味を変えない範囲において、誤記修正および言い回しの調整のみを行っている</strong>。
+        なお、本文中、<strong>AI（ChatGPT 5.2）の発言は一切改変していない</strong>。私（飯島）の発言については、<strong>意味を変えない範囲で、誤記修正および言い回しの調整のみを行っている</strong>。以下に対話を記す。
       </p>
-      <p>対話日：2026-01-15</p>
-      <p>対話記録作成日：2026-01-15</p>
+      <p>対話日：2026-01-15　／　対話記録作成日：2026-01-15</p>
     </div>
 
     <hr />
 
-    <!-- ここから対話（確認用：およそ2画面分） -->
+    <!-- 対話（確認用：2画面程度） -->
     <div class="log">
 
       <div class="turn speaker-human">
@@ -146,13 +145,6 @@
         <div class="speaker">AI：</div>
         <p>
           了解しました。その条件を前提にすると、答えは一つに収束します。トップページと対話記録は、「同じ場所にあってはならない」。しかも「導線で結ばれてもいけない」。トップページに、対話への入口を置かない──これは欠落ではなく、完成です。
-        </p>
-      </div>
-
-      <div class="turn speaker-ai">
-        <div class="speaker">AI：</div>
-        <p>
-          トップページは索引でも入口でもなく、「時間そのものの展示」です。ここでは読者は探すことも、選ぶことも、移動することも求められていない。ただ、そこに立つことだけが許されています。
         </p>
       </div>
 
