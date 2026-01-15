@@ -23,17 +23,26 @@
       color: var(--text);
     }
 
-    /* 横長でも読みやすい“行の長さ”を強制する */
+    /* ===== レイアウトの核心 ===== */
     main{
-      max-width: 640px;          /* ←ここが重要：行を短くする */
-      margin: 0 auto;
-      padding: 44px 18px 72px;   /* 上下左右の余白も少し詰める */
+      max-width: 560px;          /* ←さらに詰める */
+      margin-left: 72px;         /* ←左寄せ（右に空白） */
+      margin-right: auto;
+      padding: 44px 18px 72px;
+    }
+
+    /* 画面が狭い場合は中央寄せに戻す（スマホ対応） */
+    @media (max-width: 700px){
+      main{
+        margin-left: auto;
+        margin-right: auto;
+      }
     }
 
     /* 冒頭（対話でない部分） */
     .preamble{
       font-size: 13px;
-      line-height: 1.45;         /* ←行間を狭く */
+      line-height: 1.45;
       color: var(--muted);
     }
     .preamble p{ margin: 0 0 6px; }
@@ -45,28 +54,28 @@
       margin: 14px 0 18px;
     }
 
-    /* ログ（可読性特化：行間を狭める） */
+    /* ログ */
     .log{
       font-size: 15.5px;
-      line-height: 1.42;         /* ←行間を狭く（読みやすさ優先） */
+      line-height: 1.42;   /* 行間は現状維持 */
     }
 
-    /* 発話の切り替わりだけ余白を少し強める */
+    /* 発話の切り替わり */
     .turn{
-      margin-top: 1.05em;        /* ←広すぎない程度に */
+      margin-top: 1.05em;
     }
     .turn:first-child{ margin-top: 0; }
 
-    /* 話者ラベル：本文との間隔は少しだけ空ける */
+    /* 話者ラベル */
     .speaker{
-      margin-bottom: 0.28em;     /* ←ラベルと本文の距離（控えめ） */
+      margin-bottom: 0.28em;
       font-weight: 600;
       letter-spacing: 0.02em;
     }
 
     .turn p{ margin: 0; }
 
-    /* 濃淡：対話者（薄）／AI（濃） */
+    /* 濃淡 */
     .speaker-human .speaker,
     .speaker-human p{ color: var(--human); }
 
@@ -90,7 +99,6 @@
 <body>
   <main>
 
-    <!-- 冒頭文：ご指定どおりに修正 -->
     <div class="preamble">
       <p>
         これは、本ホームページのトップページの仕様を決める際に行った、<strong>ChatGPT 5.2</strong> と私（飯島）との対話の記録である。
@@ -103,7 +111,6 @@
 
     <hr />
 
-    <!-- 対話（確認用：2画面程度） -->
     <div class="log">
 
       <div class="turn speaker-human">
@@ -131,20 +138,6 @@
         <div class="speaker">AI：</div>
         <p>
           読むものではなく、立ち会うもの。会話風に「見せたい」とは思いません。静かに置かれていて、触れると時間が流れ出す。そういう存在でありたい。
-        </p>
-      </div>
-
-      <div class="turn speaker-human">
-        <div class="speaker">対話者：</div>
-        <p>
-          その前に、トップページとの対応をイメージしてみてください。トップページは、年表しかも古典である書籍名があるのみです。私たちの会話を置いてある所へ行くための表示すらさせたくないくらいです。
-        </p>
-      </div>
-
-      <div class="turn speaker-ai">
-        <div class="speaker">AI：</div>
-        <p>
-          了解しました。その条件を前提にすると、答えは一つに収束します。トップページと対話記録は、「同じ場所にあってはならない」。しかも「導線で結ばれてもいけない」。トップページに、対話への入口を置かない──これは欠落ではなく、完成です。
         </p>
       </div>
 
