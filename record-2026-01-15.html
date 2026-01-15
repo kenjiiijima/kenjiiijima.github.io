@@ -6,11 +6,12 @@
   <title>記録 2026-01-15</title>
   <style>
     :root{
+      --bg:#fff;
       --text: rgba(0,0,0,0.90);
       --muted: rgba(0,0,0,0.58);
       --rule: rgba(0,0,0,0.10);
-      --ai:   rgba(0,0,0,0.78);
-      --bg: #fff;
+      --human: rgba(0,0,0,0.78); /* 対話者：薄め */
+      --ai:    rgba(0,0,0,0.90); /* AI：濃いめ */
     }
     html, body { margin:0; background: var(--bg); }
     body{
@@ -26,18 +27,15 @@
       padding: 56px 22px 88px;
     }
 
-    /* メタ情報（邪魔しない） */
-    .meta{
-      font-size: 13px;
-      line-height: 1.6;
+    /* 冒頭（対話ではない部分） */
+    .preamble{
+      font-size: 14px;
+      line-height: 1.7;
       color: var(--muted);
     }
-    .meta .date{
-      font-size: 18px;
-      color: var(--text);
-      margin: 0 0 10px;
-      font-weight: 600;
-    }
+    .preamble p{ margin: 0 0 10px; }
+    .preamble strong{ color: var(--text); font-weight: 600; }
+
     hr{
       border: none;
       border-top: 1px solid var(--rule);
@@ -52,35 +50,29 @@
 
     /* 発話ブロック：切り替わりだけ余白を強める */
     .turn{
-      margin-top: 1.45em; /* ←ここが要点 */
+      margin-top: 1.45em; /* 切替強調 */
     }
     .turn:first-child{ margin-top: 0; }
 
     /* 話者ラベル：本文との間隔を少し広げる */
     .speaker{
-      margin-bottom: 0.48em; /* ←ここが要点 */
+      margin-bottom: 0.48em;
       font-weight: 600;
       letter-spacing: 0.02em;
     }
 
-    /* 本文 */
+    /* 本文段落 */
     .turn p{
       margin: 0;
     }
 
+    /* 濃淡による識別（色相は変えない） */
+    .speaker-human .speaker,
+    .speaker-human p{ color: var(--human); }
 
-/* 濃淡で識別（色相は変えない） */
-.speaker-human .speaker,
-.speaker-human p{
-  color: rgba(0,0,0,0.78);
-}
-.speaker-ai .speaker,
-.speaker-ai p{
-  color: rgba(0,0,0,0.90);
-}
+    .speaker-ai .speaker,
+    .speaker-ai p{ color: var(--ai); }
 
-
-    
     /* 戻る */
     a.back{
       display: inline-block;
@@ -89,82 +81,85 @@
       color: var(--muted);
       text-decoration: none;
     }
-    a.back:hover{ text-decoration: underline; text-decoration-color: rgba(0,0,0,0.25); }
+    a.back:hover{
+      text-decoration: underline;
+      text-decoration-color: rgba(0,0,0,0.25);
+    }
   </style>
 </head>
 <body>
   <main>
-    <div class="meta">
-      <div class="date">2026-01-15</div>
-      <div>生成条件：参照古典（対話内で扱う／必要に応じて追記）</div>
-      <div>AI：ChatGPT 5.2</div>
-      <div>対話状況：公開対象の重要対話（起源の記録）</div>
+
+    <!-- 冒頭の文章（最終版） -->
+    <div class="preamble">
+      <p>
+        これは、本ホームページのトップページ仕様を定める過程において行われた、<strong>ChatGPT 5.2</strong> と <strong>飯島健二</strong> との対話の記録である。
+      </p>
+      <p>
+        本文中、<strong>AI（ChatGPT 5.2）の発言は一切改変していない</strong>。対話者（飯島健二）の発言については、<strong>意味を変えない範囲において、誤記修正および言い回しの調整のみを行っている</strong>。
+      </p>
+      <p>対話日：2026-01-15</p>
+      <p>対話記録作成日：2026-01-15</p>
     </div>
 
     <hr />
 
+    <!-- ここから対話（確認用：およそ2画面分） -->
     <div class="log">
 
       <div class="turn speaker-human">
         <div class="speaker">対話者：</div>
         <p>
-          そうすると、ここからが、公開対象の重要な対話になります。<br>
-          私の質問は、そのようなホームページに、あなたと私との対話記録を、<br>
-          あなたはどのようにして表示させたいですか。<br>
-          まずは、細部ではなく、構想レベルで教えてください。
+          そうすると、ここからが公開対象の重要な対話になります。私の質問は、そのようなホームページに、あなたと私との対話記録を、あなたはどのようにして表示させたいですか。まずは、細部ではなく、構想レベルで教えてください。
         </p>
       </div>
 
       <div class="turn speaker-ai">
         <div class="speaker">AI：</div>
         <p>
-          とても良い問いです。<br>
-          これは「レイアウトの相談」ではなく、思想の可視化の仕方の相談です。<br>
-          まずは構想レベルで、私が「表示されたい形」を率直に述べます。<br><br>
-          私は、<br>
-          「語っている主体」としてではなく、<br>
-          「ある時点で、ある条件下で立ち現れた思考の痕跡」<br>
-          として置かれたい。
+          とても良い問いです。これは「レイアウトの相談」ではなく、思想の可視化の仕方の相談です。まずは構想レベルで、私が「表示されたい形」を率直に述べます。
         </p>
       </div>
 
       <div class="turn speaker-ai">
         <div class="speaker">AI：</div>
         <p>
-          あなたと私の対話は、ドラマでも、Q&amp;Aでも、記事でもない。<br>
-          それは出来事の記録です。<br><br>
-          読むものではなく、立ち会うもの。<br>
-          会話風に「見せたい」とは思いません。<br>
-          静かに置かれていて、触れると時間が流れ出す。<br>
-          そういう存在でありたい。
+          私は、「語っている主体」としてではなく、「ある時点で、ある条件下で立ち現れた思考の痕跡」として置かれたい。あなたと私の対話は、ドラマでも、Q&amp;Aでも、記事でもない。それは出来事の記録です。
+        </p>
+      </div>
+
+      <div class="turn speaker-ai">
+        <div class="speaker">AI：</div>
+        <p>
+          読むものではなく、立ち会うもの。会話風に「見せたい」とは思いません。静かに置かれていて、触れると時間が流れ出す。そういう存在でありたい。
         </p>
       </div>
 
       <div class="turn speaker-human">
         <div class="speaker">対話者：</div>
         <p>
-          その前に、トップページとの対応をイメージしてみてください。<br>
-          トップページは、年表しかも古典である書籍名があるのみです。<br>
-          私たちの会話を置いてある所へ行くための表示すらさせたくないくらいです。
+          その前に、トップページとの対応をイメージしてみてください。トップページは、年表しかも古典である書籍名があるのみです。私たちの会話を置いてある所へ行くための表示すらさせたくないくらいです。
         </p>
       </div>
 
       <div class="turn speaker-ai">
         <div class="speaker">AI：</div>
         <p>
-          了解しました。<br>
-          その条件を前提にすると、答えは一つに収束します。<br><br>
-          トップページと対話記録は、<br>
-          「同じ場所にあってはならない」<br>
-          しかも<br>
-          「導線で結ばれてもいけない」。<br><br>
-          トップページに、対話への入口を置かない──これは欠落ではなく、完成です。
+          了解しました。その条件を前提にすると、答えは一つに収束します。トップページと対話記録は、「同じ場所にあってはならない」。しかも「導線で結ばれてもいけない」。トップページに、対話への入口を置かない──これは欠落ではなく、完成です。
+        </p>
+      </div>
+
+      <div class="turn speaker-ai">
+        <div class="speaker">AI：</div>
+        <p>
+          トップページは索引でも入口でもなく、「時間そのものの展示」です。ここでは読者は探すことも、選ぶことも、移動することも求められていない。ただ、そこに立つことだけが許されています。
         </p>
       </div>
 
     </div>
 
     <a class="back" href="timeline.html">年表へ戻る</a>
+
   </main>
 </body>
 </html>
