@@ -12,9 +12,9 @@
     }
     html,body{ margin:0; background:#fff; color:var(--text); }
     body{
-      font-family: ui-serif,"Hiragino Mincho ProN","Yu Mincho","Noto Serif JP",serif;
-      line-height:1.75;
-      letter-spacing:.01em;
+      font-family: system-ui, -apple-system, "Segoe UI",
+               "Hiragino Kaku Gothic ProN", "Yu Gothic", "Meiryo",
+               "Noto Sans JP", sans-serif;
     }
     main{ max-width:900px; margin:0 auto; padding:64px 24px 96px; }
     h1{ font-size:28px; margin:0 0 18px; font-weight:600; }
@@ -29,8 +29,39 @@
       color:var(--text);
       text-decoration:none;
     }
+
+    /* 下線は出さない（リンクの匂いを消す） */
+a.stealth-title:hover,
+a.stealth:hover{
+  text-decoration: none;
+}
+
+/* 触れたことの“反応”は、濃度の微変化だけ */
+a.stealth-title{
+  display: inline-block;           /* 揺れのため */
+  transition: opacity 200ms ease;  /* 濃度変化 */
+}
+a.stealth-title.is-hover{
+  opacity: 0.88;                   /* ほんの少しだけ変える */
+}
+
+/* ごく小さな揺れ（1回） */
+@keyframes microWiggle {
+  0%   { transform: translateX(0); }
+  30%  { transform: translateX(0.6px); }
+  60%  { transform: translateX(-0.4px); }
+  100% { transform: translateX(0); }
+}
+a.stealth-title.wiggle{
+  animation: microWiggle 240ms ease-out 1;
+}
+
+
+
+
+    
     /* 触れたときだけ、わずかに反応する */
-    a.stealth:hover{
+   /* a.stealth:hover{
       color:rgba(0,0,0,.85);
       text-decoration:underline;
       text-decoration-color:rgba(0,0,0,.18);
@@ -42,6 +73,7 @@
       color:var(--text);
       text-decoration:none;
     }
+    
     a.stealth-title:hover{
       text-decoration:underline;
       text-decoration-color:rgba(0,0,0,.12);
@@ -164,14 +196,31 @@
     const delayMs = 1200; // 滞留時間：思想に合わせて後で調整
 
     function start(){
-      clearTimeout(timer);
+      function start(){
+  cancel();
+
+  // 触れた反応：微かな濃度変化 + 揺れ（1回）
+  target.classList.add("is-hover");
+  target.classList.remove("wiggle"); // 連続発火対策
+  // reflowでアニメを確実に再スタート
+  void target.offsetWidth;
+  target.classList.add("wiggle");
+
+  timer = setTimeout(() => { window.location.href = href; }, delayMs);
+}
+
+      /*clearTimeout(timer);
       timer = setTimeout(() => { window.location.href = href; }, delayMs);
-    }
-    function cancel(){
-      clearTimeout(timer);
-      timer = null;
+     */
     }
 
+function cancel(){
+  clearTimeout(timer);
+  timer = null;
+  target.classList.remove("is-hover");
+}
+
+    
     target.addEventListener("mouseenter", start);
     target.addEventListener("mouseleave", cancel);
     target.addEventListener("focus", start);
