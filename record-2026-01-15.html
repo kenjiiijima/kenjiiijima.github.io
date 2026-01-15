@@ -15,7 +15,7 @@
     html,body{ background:var(--bg); color:var(--text); margin:0; }
     body{
       font-family: ui-serif,"Hiragino Mincho ProN","Yu Mincho","Noto Serif JP",serif;
-      line-height:1.9;
+      line-height:1.55;
       letter-spacing:.01em;
     }
     main{ max-width:860px; margin:0 auto; padding:64px 24px 96px; }
@@ -50,7 +50,8 @@
     <div class="section-title">記録</div>
     <div class="log" id="log"></div>
 
-    <a class="back" href="./index.html">戻る</a>
+    <a class="back" href="./">年表へ戻る</a>
+
   </main>
 
   <script>
@@ -1254,8 +1255,37 @@ ChatGPT 5.2：はい、その言い方で合っています。
       return s.replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>");
     }
 
-    const lines = raw.split("\n");
-    const out = lines.map(line => {
+const lines = raw.split("\n");
+
+// 連続する空行は1つに圧縮（テキストの意味は変えない／表示だけ整える）
+const collapsed = [];
+let prevEmpty = false;
+for (const line of lines) {
+  const isEmpty = line.trim() === "";
+  if (isEmpty) {
+    if (!prevEmpty) collapsed.push(""); // 空行は1回だけ入れる
+    prevEmpty = true;
+  } else {
+    collapsed.push(line);
+    prevEmpty = false;
+  }
+}
+
+const out = collapsed.map(line => {
+  if (line.startsWith("あなた：")) {
+    const rest = line.slice("あなた：".length);
+    return `<span class="speaker">あなた：</span>${renderBold(escapeHTML(rest))}`;
+  }
+  if (line.startsWith("ChatGPT 5.2：")) {
+    const rest = line.slice("ChatGPT 5.2：".length);
+    return `<span class="speaker">ChatGPT 5.2：</span>${renderBold(escapeHTML(rest))}`;
+  }
+  return renderBold(escapeHTML(line));
+}).join("\n");
+
+
+
+    
       if (line.startsWith("あなた：")) {
         const rest = line.slice("あなた：".length);
         return `<span class="speaker">あなた：</span>${renderBold(escapeHTML(rest))}`;
