@@ -205,7 +205,7 @@
   <div class="scroll-dummy" aria-hidden="true"></div>
 
   <div class="exp" id="exp">
-    <div><b>EXP 7</b></div>
+    <div><b>EXP 8</b></div>
     <div>mode: <span id="mode">down</span></div>
     <div>state: <span id="runstate">off</span></div>
     <div>y/max: <span id="pos">0</span>/<span id="max">0</span></div>
@@ -227,14 +227,11 @@
     const lastEl = document.getElementById('last');
 
     // ===== 指定 =====
-    // 進む：10倍 / 小戻り：3倍 / 巻き戻し：30倍 / 呼吸なし
     const BASE = 1.2;
-    const FORWARD_MULT = 10;
-    const BACKSTEP_MULT = 3;
-    const REWIND_MULT = 30;
-
-    // ===== 動き（周期的な呼吸は無し） =====
-    const WANDER = 0.30;        // 前進時の微ゆらぎ（周期なし）
+    const FORWARD_MULT = 10;   // 進む：10倍
+    const BACKSTEP_MULT = 3;   // 小戻り：3倍
+    const REWIND_MULT = 30;    // 巻き戻し：30倍
+    const WANDER = 0.30;       // 周期呼吸なし（微ゆらぎのみ）
     const PAUSE_CHANCE = 0.008;
     const BACKSTEP_CHANCE = 0.004;
     const MAX_BACKSTEP_PX = 90;
@@ -287,6 +284,8 @@
       mode = 'down';
       const wiggle = 1 + rand(-WANDER, WANDER);
       targetV = (BASE * FORWARD_MULT) * wiggle;
+      pausedUntil = 0;
+      backModeUntil = 0;
       updateDiag();
     }
 
@@ -305,6 +304,7 @@
       updateDiag();
     }
 
+    // マウス操作で stop
     addEventListener('wheel', stop, {passive:true});
     addEventListener('mousedown', (e) => {
       if (e.target && e.target.closest && e.target.closest('#fab')) return;
@@ -380,11 +380,12 @@
       if (turningOn) {
         ignoreStopUntil = performance.now() + IGNORE_STOP_MS;
 
-        // ★要求：OFF→ON のときは必ず「進む」から開始
+        // ★要求：停止していた時が巻き戻し中でも、OFF→ON では必ず前進から
         mode = 'down';
         y = window.scrollY;
         lastT = performance.now();
         enterDown();
+
         requestAnimationFrame(step);
       } else {
         updateDiag();
