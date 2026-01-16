@@ -63,8 +63,10 @@
       text-decoration-color: rgba(0,0,0,0.22);
     }
 
+    /* 実験用：確実にスクロール余地を作る（動作確認後に消してOK） */
     .scroll-dummy{ height: 1400px; }
 
+    /* 右下：walk トグル */
     .fab{
       position: fixed;
       right: 14px;
@@ -100,6 +102,7 @@
       font-variant-numeric: tabular-nums;
     }
 
+    /* 右上：実験番号＆診断 */
     .exp{
       position: fixed;
       top: 12px;
@@ -123,6 +126,7 @@
 
 <body>
   <main>
+    <!-- timeline.md の先頭 # [年表（確認用）](record-2026-01-15.html) を再現 -->
     <h1><a class="stealth" href="record-2026-01-15.html">年表（確認用）</a></h1>
     <hr>
 
@@ -209,16 +213,20 @@
     </ul>
   </main>
 
+  <!-- 実験用：スクロール余地 -->
   <div class="scroll-dummy" aria-hidden="true"></div>
 
+  <!-- 右上：診断 -->
   <div class="exp" id="exp">
-    <div><b>EXP 3</b></div>
+    <div><b>EXP 4</b></div>
     <div>JS: <span id="jsok">…</span></div>
+    <div>cycle: <span id="cycle">down</span></div>
     <div>click: <span id="clicks">0</span></div>
     <div>state: <span id="runstate">off</span></div>
     <div>y/max: <span id="pos">0</span>/<span id="max">0</span></div>
   </div>
 
+  <!-- 右下：walk -->
   <div class="fab" id="fab">
     <button id="toggle" type="button">walk</button>
     <span class="state" id="state">off</span>
@@ -231,29 +239,35 @@
     const runStateEl = document.getElementById('runstate');
     const posEl = document.getElementById('pos');
     const maxEl = document.getElementById('max');
+    const cycleEl = document.getElementById('cycle');
     jsok.textContent = 'OK';
 
     // ===== walk UI =====
     const toggleBtn = document.getElementById('toggle');
     const stateEl = document.getElementById('state');
 
-    // ====== 調整パラメータ（ゆっくり & 生き物感） ======
-    const BASE_PX_PER_SEC = 1.2;     // ゆっくり（1/10）
-    const WANDER = 0.65;             // ゆらぎ
-    const PAUSE_CHANCE = 0.012;      // 立ち止まり頻度
-    const BACKSTEP_CHANCE = 0.004;   // 後戻り頻度
-    const MAX_BACKSTEP_PX = 90;      // 後戻り最大
+    // ====== 動作仕様 ======
+    // (1) 通常はゆっくり下へ（時々だけ「少し戻る」）
+    // (2) 下端に到達したら、上へ「10倍速」で巻き戻す
+    // (3) 上端に到達したら、また (1) を繰り返す
+    // 呼吸は無し
+    // =====================
+
+    // ====== 調整パラメータ ======
+    const BASE_PX_PER_SEC = 1.2;       // 下へ進む基本速度（ゆっくり）
+    const WANDER = 0.65;               // 下へ進むゆらぎ（前進時のみ）
+    const PAUSE_CHANCE = 0.012;        // 立ち止まり頻度（前進時のみ）
+    const BACKSTEP_CHANCE = 0.004;     // 小さな後戻り頻度（前進時のみ）
+    const MAX_BACKSTEP_PX = 90;        // 小さな後戻り量
     const MIN_PAUSE_MS = 450;
     const MAX_PAUSE_MS = 2300;
-    const EDGE_PADDING_PX = 10;      // 下端停止余白
 
-    // ★後戻りを「なめらか」にする設定
-    const BACKSTEP_SPEED_MULT = 4.0; // 戻るときの速度倍率（大きいほど素早く戻る）
-    const BACKSTEP_DURATION_MS = 650;// 戻りモードの持続（なめらかに戻ってから前進に復帰）
+    const EDGE_PADDING_PX = 10;
+    const REWIND_SPEED_MULT = 10.0;    // ★下端→上端の巻き戻し速度倍率（10倍）
+    const REWIND_EASE = 0.08;          // 巻き戻しのなめらかさ（大きいほど追従が速い）
 
-    // ★“動いてる感”を出す微小な呼吸（px）
-    const BREATH_PX = 1.0;           // 0 にすると無効
-    const BREATH_PERIOD_MS = 1800;   // 呼吸周期
+    // クリック直後に stop が誤発火しない猶予
+    const IGNORE_STOP_MS = 350;
     // ================================================
 
     const clamp = (x,a,b) => Math.max(a, Math.min(b,x));
@@ -269,29 +283,30 @@
     };
 
     let running = false;
-    let pausedUntil = 0;
     let lastT = performance.now();
 
-    // 速度の目標（符号あり：+で前進、-で後退）
-    let targetV = BASE_PX_PER_SEC;
+    // 速度制御（符号あり）
+    let targetV = BASE_PX_PER_SEC; // +:下へ / -:上へ
     let v = BASE_PX_PER_SEC;
 
+    let pausedUntil = 0;
     let clickCount = 0;
 
-    // ★小数の移動量を蓄積（遅い速度でも必ず動く）
+    // ★遅い速度でも確実に進むために小数を蓄積
     let virtualY = 0;
 
-    // walk ON 直後の誤停止を防ぐ猶予
-    let ignoreStopUntil = 0;
+    // モード: 'down'（ゆっくり下） / 'rewind'（上へ巻き戻し）
+    let mode = 'down';
 
-    // ★なめらか後戻りのための「戻りモード」管理
-    let backModeUntil = 0;
+    // stop 抑止
+    let ignoreStopUntil = 0;
 
     function updateDiag(){
       stateEl.textContent = running ? 'on' : 'off';
+      runStateEl.textContent = running ? 'on' : 'off';
       posEl.textContent = String(Math.round(window.scrollY));
       maxEl.textContent = String(Math.round(maxScrollTop()));
-      runStateEl.textContent = running ? 'on' : 'off';
+      cycleEl.textContent = mode;
     }
     updateDiag();
     window.addEventListener('scroll', updateDiag, { passive:true });
@@ -306,29 +321,44 @@
 
     // ユーザー操作で即停止（walk 操作自体は止めない）
     window.addEventListener('wheel', stop, { passive:true });
-
+    window.addEventListener('keydown', stop);
     window.addEventListener('touchstart', (e) => {
       if (e.target && e.target.closest && e.target.closest('#fab')) return;
       stop();
     }, { passive:true });
-
-    window.addEventListener('keydown', stop);
-
     window.addEventListener('mousedown', (e) => {
       if (e.target && e.target.closest && e.target.closest('#fab')) return;
       stop();
     });
 
-    const retargetForward = () => {
+    function retargetForward(){
       const wiggle = 1 + rand(-WANDER, WANDER);
-      targetV = BASE_PX_PER_SEC * wiggle; // 前進の目標速度（+）
-    };
+      targetV = BASE_PX_PER_SEC * wiggle; // 前進（+）
+    }
     retargetForward();
+
+    // 前進モードのゆらぎ更新（巻き戻し中は更新しない）
     setInterval(() => {
-      // 戻りモード中は、前進の目標を更新しない（戻りの滑らかさ優先）
-      if (performance.now() < backModeUntil) return;
+      if (!running) return;
+      if (mode !== 'down') return;
       retargetForward();
     }, 1800);
+
+    function enterDown(){
+      mode = 'down';
+      pausedUntil = 0;
+      v = Math.max(0, v); // 下向きへ寄せる
+      retargetForward();
+      updateDiag();
+    }
+
+    function enterRewind(){
+      mode = 'rewind';
+      pausedUntil = 0;
+      // 巻き戻しは - 方向へ
+      targetV = -BASE_PX_PER_SEC * REWIND_SPEED_MULT;
+      updateDiag();
+    }
 
     function step(t){
       if (!running) return;
@@ -339,52 +369,59 @@
       const mx = maxScrollTop();
       if (mx <= 0) { stop(); return; }
 
-      // 下端停止（戻りは止めない）
-      if (virtualY >= mx - EDGE_PADDING_PX && targetV >= 0) { stop(); return; }
-
-      if (t < pausedUntil) { requestAnimationFrame(step); return; }
-
-      // 立ち止まり（戻りモード中は発生させない）
-      if (t >= backModeUntil && Math.random() < PAUSE_CHANCE) {
-        pausedUntil = t + rand(MIN_PAUSE_MS, MAX_PAUSE_MS);
-        requestAnimationFrame(step);
-        return;
+      // モード遷移（下端→巻き戻し / 上端→前進）
+      if (mode === 'down') {
+        if (virtualY >= mx - EDGE_PADDING_PX) {
+          enterRewind();
+        }
+      } else { // rewind
+        if (virtualY <= 0 + EDGE_PADDING_PX) {
+          virtualY = 0;
+          window.scrollTo(0, 0);
+          enterDown();
+        }
       }
 
-      // ★なめらか後戻り：一時的に targetV をマイナスにする
-      if (t >= backModeUntil && Math.random() < BACKSTEP_CHANCE) {
-        const back = rand(20, MAX_BACKSTEP_PX);
-        const backSpeed = -BASE_PX_PER_SEC * BACKSTEP_SPEED_MULT; // 負の速度
-        targetV = backSpeed;
-        backModeUntil = t + BACKSTEP_DURATION_MS;
+      // 立ち止まり（前進モードのみ）
+      if (mode === 'down') {
+        if (t < pausedUntil) {
+          requestAnimationFrame(step);
+          return;
+        }
+        if (Math.random() < PAUSE_CHANCE) {
+          pausedUntil = t + rand(MIN_PAUSE_MS, MAX_PAUSE_MS);
+          requestAnimationFrame(step);
+          return;
+        }
 
-        // 戻る量を「目標位置」として軽く仕込む（戻りすぎ防止）
-        const desired = clamp(virtualY - back, 0, mx);
-        // 戻りモードの間に desired へ近づくように “virtualY” を誘導（軽く）
-        // ※ ここでは固定値として保持し、下の処理で clamp だけ効かせる
-        virtualY = Math.max(virtualY, desired); // 位置は急に変えず、速度で戻す
-        requestAnimationFrame(step);
-        return;
+        // 小さな後戻り（前進モードのみ・なめらかに）
+        if (Math.random() < BACKSTEP_CHANCE) {
+          // 一瞬だけ targetV をマイナス方向に倒して、自然に戻す
+          const back = rand(20, MAX_BACKSTEP_PX);
+          const backSpeed = -BASE_PX_PER_SEC * 4.0; // 小戻りは軽く速い
+          targetV = backSpeed;
+          const backUntil = t + 650; // 戻り時間
+
+          // backUntil までの間だけ「戻り」に寄せる
+          const follow = 0.06;
+          v = v + (targetV - v) * follow;
+          virtualY = clamp(virtualY + v * dt, 0, mx);
+          window.scrollTo(0, Math.round(virtualY));
+
+          // 戻りが終わったら前進へ復帰
+          if (t >= backUntil) retargetForward();
+
+          requestAnimationFrame(step);
+          return;
+        }
       }
 
-      // 戻りモードが終わったら、前進目標へ復帰
-      if (t >= backModeUntil && targetV < 0) {
-        retargetForward();
-      }
-
-      // 速度の追従（符号あり）
-      const follow = 0.06;
+      // 速度追従
+      const follow = (mode === 'rewind') ? REWIND_EASE : 0.06;
       v = v + (targetV - v) * follow;
 
-      // ★呼吸（微小揺れ）：視認しにくい速度でも「生きてる感」を出す
-      let breath = 0;
-      if (BREATH_PX > 0) {
-        const phase = (t % BREATH_PERIOD_MS) / BREATH_PERIOD_MS;
-        breath = Math.sin(phase * Math.PI * 2) * BREATH_PX;
-      }
-
       virtualY = clamp(virtualY + v * dt, 0, mx);
-      window.scrollTo(0, Math.round(virtualY + breath));
+      window.scrollTo(0, Math.round(virtualY));
       requestAnimationFrame(step);
     }
 
@@ -395,14 +432,21 @@
       running = !running;
 
       if (running) {
-        ignoreStopUntil = performance.now() + 350;
+        ignoreStopUntil = performance.now() + IGNORE_STOP_MS;
 
-        // 開始時に virtualY を現在位置で初期化
+        // 現在位置で初期化
         virtualY = window.scrollY;
 
-        // 念のため：前進目標へ
-        retargetForward();
-        v = targetV;
+        // もし途中で止めて再開したら、その位置に応じてモードを決める
+        const mx = maxScrollTop();
+        if (virtualY >= mx - EDGE_PADDING_PX) {
+          enterRewind();
+        } else if (virtualY <= 0 + EDGE_PADDING_PX) {
+          enterDown();
+        } else {
+          // 中間は基本 down
+          enterDown();
+        }
 
         lastT = performance.now();
         requestAnimationFrame(step);
