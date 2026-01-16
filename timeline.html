@@ -63,10 +63,8 @@
       text-decoration-color: rgba(0,0,0,0.22);
     }
 
-    /* 実験用：確実にスクロール余地を作る（動作確認後に消してOK） */
     .scroll-dummy{ height: 1400px; }
 
-    /* 右下：walk トグル */
     .fab{
       position: fixed;
       right: 14px;
@@ -94,15 +92,7 @@
       cursor: pointer;
       letter-spacing: 0.02em;
     }
-    .fab button:hover{
-      text-decoration: underline;
-      text-decoration-color: rgba(0,0,0,0.25);
-    }
-    .fab .state{
-      font-variant-numeric: tabular-nums;
-    }
 
-    /* 右上：実験番号＆診断 */
     .exp{
       position: fixed;
       top: 12px;
@@ -215,7 +205,7 @@
   <div class="scroll-dummy" aria-hidden="true"></div>
 
   <div class="exp" id="exp">
-    <div><b>EXP 5</b></div>
+    <div><b>EXP 6</b></div>
     <div>mode: <span id="mode">down</span></div>
     <div>state: <span id="runstate">off</span></div>
     <div>y/max: <span id="pos">0</span>/<span id="max">0</span></div>
@@ -236,25 +226,24 @@
     const maxEl = document.getElementById('max');
     const lastEl = document.getElementById('last');
 
-    // ===== 速度指定（あなたの指定） =====
-    // 進む：3倍 / 小戻り：3倍 / 巻き戻し：10倍 / 呼吸なし
-    const BASE = 1.2;                // 1x の基準
-    const FORWARD_MULT = 3;          // ★進む 3倍
-    const BACKSTEP_MULT = 3;         // ★小戻り 3倍
-    const REWIND_MULT = 10;          // ★巻き戻し 10倍
+    // ===== あなたの指定 =====
+    // 進む：10倍 / 小戻り：3倍 / 巻き戻し：30倍 / 呼吸なし
+    const BASE = 1.2;
+    const FORWARD_MULT = 10;
+    const BACKSTEP_MULT = 3;
+    const REWIND_MULT = 30;
 
-    // ===== 動きの質感（必要最小） =====
-    const WANDER = 0.45;             // 前進時の微ゆらぎ（呼吸ではない：周期変動なし）
-    const PAUSE_CHANCE = 0.010;      // 前進時の立ち止まり
-    const BACKSTEP_CHANCE = 0.004;   // 前進時の小戻り発生
+    // ===== 動き（周期的呼吸は無し：ランダムは少し残す） =====
+    const WANDER = 0.30;             // 前進時の微ゆらぎ（周期なし）
+    const PAUSE_CHANCE = 0.008;
+    const BACKSTEP_CHANCE = 0.004;
     const MAX_BACKSTEP_PX = 90;
     const BACKSTEP_DURATION_MS = 650;
 
-    const EDGE_PAD = 8;              // 上端/下端の判定余白
-    const TRIGGER_PAD = 12;          // 「2026が画面下に見えた」判定の余白
-    const IGNORE_STOP_MS = 380;      // クリック直後 stop 誤発火防止
+    const EDGE_PAD = 10;
+    const TRIGGER_PAD = 12;          // 「2026が画面下に見えた」判定余白
+    const IGNORE_STOP_MS = 380;
 
-    // ===== ユーティリティ =====
     const clamp = (x,a,b)=>Math.max(a, Math.min(b,x));
     const rand = (a,b)=>a + Math.random()*(b-a);
 
@@ -264,8 +253,7 @@
       return Math.max(0, h - innerHeight);
     };
 
-    // ★「2026（最後の本）が画面下に見えた位置」＝ lastEl の底が viewport 底に来る瞬間
-    // triggerY = lastBottomAbs - innerHeight + TRIGGER_PAD
+    // ★トリガー：lastEl の底が viewport の底にかかったら巻き戻し開始
     const triggerY = () => {
       const mx = maxScroll();
       const lastBottomAbs = lastEl.offsetTop + lastEl.offsetHeight;
@@ -273,25 +261,16 @@
       return clamp(y, 0, mx);
     };
 
-    // ===== 状態 =====
     let running = false;
-    let mode = 'down';               // 'down' or 'rewind'
+    let mode = 'down';
     let lastT = performance.now();
 
-    // 小数蓄積（遅くても動く）
-    let y = 0;
-
-    // 速度（符号あり）
+    let y = 0;               // virtualY
     let v = BASE;
     let targetV = BASE * FORWARD_MULT;
 
-    // 前進中の小戻りモード
-    let backModeUntil = 0;
-
-    // 前進中の一時停止
     let pausedUntil = 0;
-
-    // stop 誤発火抑止
+    let backModeUntil = 0;
     let ignoreStopUntil = 0;
 
     function updateDiag(){
@@ -307,18 +286,14 @@
 
     function enterDown(){
       mode = 'down';
-      // 前進速度（+）
       const wiggle = 1 + rand(-WANDER, WANDER);
-      targetV = (BASE * FORWARD_MULT) * wiggle;
-      // 追従は滑らかに
+      targetV = (BASE * FORWARD_MULT) * wiggle; // +方向
       updateDiag();
     }
 
     function enterRewind(){
       mode = 'rewind';
-      // 巻き戻し速度（-）
-      targetV = -BASE * REWIND_MULT;
-      // 立ち止まり等は解除
+      targetV = -BASE * REWIND_MULT;            // -方向（高速）
       pausedUntil = 0;
       backModeUntil = 0;
       updateDiag();
@@ -331,10 +306,9 @@
       updateDiag();
     }
 
-    // ★マウス操作で stop（要求）
+    // マウス操作で stop（要求）
     addEventListener('wheel', stop, {passive:true});
     addEventListener('mousedown', (e) => {
-      // walkボタン周辺は停止扱いにしない
       if (e.target && e.target.closest && e.target.closest('#fab')) return;
       stop();
     });
@@ -353,14 +327,12 @@
       const mx = maxScroll();
       if (mx <= 0) { stop(); return; }
 
-      // ===== モード遷移 =====
+      // ===== トリガー判定 =====
       if (mode === 'down') {
-        // 2026 が「画面下に見えた」位置を超えたら必ず巻き戻しへ
         if (y >= triggerY()) {
           enterRewind();
         }
-      } else { // rewind
-        // 上端付近に来たら down へ
+      } else {
         if (y <= EDGE_PAD) {
           y = 0;
           scrollTo(0, 0);
@@ -368,49 +340,38 @@
         }
       }
 
-      // ===== 前進モードの挙動（小戻り・立ち止まり） =====
+      // ===== 前進モードの小戻り/停止 =====
       if (mode === 'down') {
-        if (t < pausedUntil) {
-          requestAnimationFrame(step);
-          return;
-        }
+        if (t < pausedUntil) { requestAnimationFrame(step); return; }
 
-        // 立ち止まり（小戻り中は起こさない）
         if (t >= backModeUntil && Math.random() < PAUSE_CHANCE) {
           pausedUntil = t + rand(450, 2300);
           requestAnimationFrame(step);
           return;
         }
 
-        // 小戻り（なめらか）：一定時間だけ targetV を負にする
         if (t >= backModeUntil && Math.random() < BACKSTEP_CHANCE) {
           const back = rand(20, MAX_BACKSTEP_PX);
-          // 戻る量に応じて duration 内にだいたい戻れる速度（3倍）
-          targetV = -BASE * BACKSTEP_MULT;
+          targetV = -BASE * BACKSTEP_MULT; // 小戻り：3倍
 
-          // 「戻りすぎ」防止のため、到達したい最小値を作る
           const desiredMin = clamp(y - back, 0, mx);
-
           backModeUntil = t + BACKSTEP_DURATION_MS;
 
-          // 戻りモード中は、desiredMin を下回ったら即前進へ戻す
           if (y <= desiredMin + 0.5) {
             backModeUntil = 0;
             enterDown();
           }
         }
 
-        // 小戻り終了 → 前進へ復帰
         if (t >= backModeUntil && targetV < 0) {
           enterDown();
         }
       }
 
-      // ===== 速度追従（巻き戻しは少し強めに追従） =====
-      const follow = (mode === 'rewind') ? 0.10 : 0.06;
+      // ===== 追従（巻き戻しは強め） =====
+      const follow = (mode === 'rewind') ? 0.14 : 0.06;
       v = v + (targetV - v) * follow;
 
-      // ===== 位置更新（小数蓄積） =====
       y = clamp(y + v * dt, 0, mx);
       scrollTo(0, Math.round(y));
 
@@ -426,7 +387,6 @@
         y = window.scrollY;
         lastT = performance.now();
 
-        // 再開位置がすでにトリガーを超えていたら、即巻き戻し
         if (y >= triggerY()) enterRewind();
         else enterDown();
 
