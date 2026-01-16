@@ -5,6 +5,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>timeline</title>
   <style>
+.scroll-dummy{
+  height: 1200px;   /* 実験用：あとで消す */
+}
     :root{
       --bg:#fff;
       --text: rgba(0,0,0,0.90);
@@ -230,7 +233,7 @@
     <button id="toggle" type="button" aria-label="walk toggle">walk</button>
     <span class="state" id="state">off</span>
   </div>
-
+ <div class="scroll-dummy"></div>
   <script>
   (() => {
     const jsok = document.getElementById('jsok');
