@@ -227,4 +227,101 @@ function cancel(){
     target.addEventListener("blur", cancel);
   </script>
 </body>
+<script>
+(() => {
+  // ====== 調整パラメータ（ここだけ触ればOK） ======
+  const BASE_PX_PER_SEC = 14;     // 基本速度（ゆっくり）
+  const WANDER = 0.55;            // 速度ゆらぎ（0〜1）
+  const PAUSE_CHANCE = 0.010;     // 立ち止まり頻度（小さいほど少ない）
+  const BACKSTEP_CHANCE = 0.004;  // 後戻り頻度
+  const MAX_BACKSTEP_PX = 120;    // 後戻り最大量
+  const MIN_PAUSE_MS = 400;       // 最短停止
+  const MAX_PAUSE_MS = 2200;      // 最長停止
+  const EDGE_PADDING_PX = 10;     // 上下端で止める余白
+  // ================================================
+
+  // reduced motion の人には自動を出さない
+  const reduceMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if (reduceMotion) return;
+
+  let running = true;
+  let pausedUntil = 0;
+  let lastT = performance.now();
+  let targetV = BASE_PX_PER_SEC;  // 目標速度（ゆらぐ）
+  let v = BASE_PX_PER_SEC;        // 実速度（なめらかに追従）
+
+  const clamp = (x, a, b) => Math.max(a, Math.min(b, x));
+  const rand = (a, b) => a + Math.random() * (b - a);
+  const now = () => performance.now();
+
+  // ユーザーが触れたら停止（思想的にも必須）
+  const stop = () => { running = false; };
+  window.addEventListener('wheel', stop, { passive:true });
+  window.addEventListener('touchstart', stop, { passive:true });
+  window.addEventListener('keydown', stop);
+  window.addEventListener('mousedown', stop);
+
+  // 速度目標をときどき更新（歩調が変わる）
+  const retarget = () => {
+    const wiggle = 1 + rand(-WANDER, WANDER);
+    targetV = BASE_PX_PER_SEC * wiggle;
+  };
+  retarget();
+  setInterval(retarget, 1800); // 歩調更新間隔
+
+  const maxScrollTop = () => Math.max(0, document.documentElement.scrollHeight - window.innerHeight);
+
+  function step(t){
+    if (!running) return;
+
+    const dt = (t - lastT) / 1000;
+    lastT = t;
+
+    // 端なら止める（無限ループにしない思想）
+    const top = window.scrollY;
+    const maxTop = maxScrollTop();
+    if (top <= EDGE_PADDING_PX || top >= maxTop - EDGE_PADDING_PX) {
+      // 端では静かに停止
+      return;
+    }
+
+    // 停止中
+    if (t < pausedUntil) {
+      requestAnimationFrame(step);
+      return;
+    }
+
+    // 立ち止まり（ときどき）
+    if (Math.random() < PAUSE_CHANCE) {
+      pausedUntil = t + rand(MIN_PAUSE_MS, MAX_PAUSE_MS);
+      requestAnimationFrame(step);
+      return;
+    }
+
+    // 後戻り（ときどき）
+    if (Math.random() < BACKSTEP_CHANCE) {
+      const back = rand(20, MAX_BACKSTEP_PX);
+      const newTop = clamp(top - back, 0, maxTop);
+      window.scrollTo(0, newTop);
+      // 少し止まると「振り返り」感が出る
+      pausedUntil = t + rand(250, 900);
+      requestAnimationFrame(step);
+      return;
+    }
+
+    // 速度をなめらかに追従（急変させない）
+    const follow = 0.06; // 小さいほど“なめらか”
+    v = v + (targetV - v) * follow;
+
+    // スクロール
+    const nextTop = clamp(top + v * dt, 0, maxTop);
+    window.scrollTo(0, nextTop);
+
+    requestAnimationFrame(step);
+  }
+
+  requestAnimationFrame(step);
+})();
+</script>
+  
 </html>
