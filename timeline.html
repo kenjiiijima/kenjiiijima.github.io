@@ -292,15 +292,14 @@
     window.addEventListener('scroll', updateDiag, { passive:true });
     window.addEventListener('resize', updateDiag);
 
-    const stop = () => {
-            //console.log('[STOP] fired by', (new Error()).stack.split('\n')[2]?.trim());
-const stop = (why = '?') => { console.log('[STOP]', why, 'running(before)=', running);
+const stop = (why = '?') => {
+  // console.log('[STOP]', why, 'running(before)=', running);
+  if (!running) return;
+  running = false;
+  stateEl.textContent = 'off';
+  updateDiag();
+};
 
-      if (!running) return;
-      running = false;
-      stateEl.textContent = 'off';
-      updateDiag();
-    };
 
     // ユーザー操作で即停止
    // window.addEventListener('wheel', stop, { passive:true });
