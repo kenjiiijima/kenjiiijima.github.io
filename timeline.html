@@ -365,6 +365,8 @@ window.addEventListener('mousedown', (e) => {
     }
 
     function toggle(){
+            console.count('[toggle] called');
+
       console.log('TOGGLE', Date.now(), 'running(before)=', running);
       clickCount += 1;
       clicksEl.textContent = String(clickCount);
