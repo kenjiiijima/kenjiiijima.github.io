@@ -296,10 +296,19 @@
 
     // ユーザー操作で即停止
     window.addEventListener('wheel', stop, { passive:true });
-    window.addEventListener('touchstart', stop, { passive:true });
-    window.addEventListener('keydown', stop);
-    window.addEventListener('mousedown', stop);
+    
+window.addEventListener('touchstart', (e) => {
+  if (e.target && e.target.closest && e.target.closest('#fab')) return;
+  stop();
+}, { passive:true });
 
+    
+    window.addEventListener('keydown', stop);
+    
+window.addEventListener('mousedown', (e) => {
+  if (e.target && e.target.closest && e.target.closest('#fab')) return; // walk操作は停止扱いにしない
+  stop();
+});
     const retarget = () => {
       const wiggle = 1 + rand(-WANDER, WANDER);
       targetV = BASE_PX_PER_SEC * wiggle;
