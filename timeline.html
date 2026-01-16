@@ -17,55 +17,46 @@
       font-family: system-ui, -apple-system, "Segoe UI",
                    "Hiragino Kaku Gothic ProN", "Yu Gothic", "Meiryo",
                    "Noto Sans JP", sans-serif;
-      letter-spacing: 0.01em;
-      line-height: 1.55;
+      line-height:1.55;
     }
     main{
-      max-width: 760px;
-      margin-left: auto;
-      margin-right: auto;
-      padding: 44px 18px 96px;
+      max-width:760px;
+      margin:0 auto;
+      padding:44px 18px 96px;
     }
-    h1{ font-size:16px; font-weight:600; margin:0 0 14px; }
-    hr{ border:none; border-top:1px solid var(--rule); margin:16px 0 18px; }
-    h2{ font-size:13px; font-weight:600; color:var(--muted); margin:22px 0 10px; }
+    h2{ font-size:13px; color:var(--muted); margin:22px 0 10px; }
     ul{ margin:0 0 0 1.15em; padding:0; }
     li{ margin:6px 0; }
 
-    .scroll-dummy{ height: 1400px; }
+    .scroll-dummy{ height:1400px; }
 
     .fab{
-      position:fixed; right:14px; bottom:14px; z-index:9999;
+      position:fixed; right:14px; bottom:14px;
       display:flex; gap:10px; align-items:center;
       padding:10px 12px;
       border:1px solid rgba(0,0,0,0.12);
       border-radius:999px;
       background:rgba(255,255,255,0.92);
-      font-size:12.5px;
+      font-size:12px;
+      z-index:9999;
     }
     .fab button{ border:none; background:none; cursor:pointer; }
-    .fab .state{ font-variant-numeric: tabular-nums; }
 
     .exp{
-      position:fixed; top:12px; right:12px; z-index:9999;
+      position:fixed; top:12px; right:12px;
       padding:10px 12px;
       border:1px solid rgba(0,0,0,0.12);
       border-radius:12px;
       background:rgba(255,255,255,0.92);
       font-size:12px;
-      min-width:190px;
+      z-index:9999;
     }
   </style>
 </head>
 
 <body>
 <main>
-  <h1>年表（確認用）</h1>
-  <hr>
-
-  <!-- （内容はそのまま） -->
-  <h2>前8世紀頃</h2>
-  <ul><li>イリアス</li><li>オデュッセイア</li></ul>
+  <h2>前8世紀頃</h2><ul><li>イリアス</li><li>オデュッセイア</li></ul>
   <h2>前7世紀</h2><ul><li>神統記</li></ul>
   <h2>前4世紀</h2><ul><li>ティマイオス</li><li>形而上学</li><li>国家</li></ul>
   <h2>1687</h2><ul><li>プリンキピア</li></ul>
@@ -94,58 +85,59 @@
 <div class="scroll-dummy"></div>
 
 <div class="exp">
-  <div>cycle: <span id="cycle">down</span></div>
-  <div>state: <span id="runstate">off</span></div>
+  <div>mode: <span id="mode">down</span></div>
+  <div>state: <span id="state2">off</span></div>
 </div>
 
 <div class="fab">
   <button id="toggle">walk</button>
-  <span class="state" id="state">off</span>
+  <span id="state">off</span>
 </div>
 
 <script>
 const toggleBtn = document.getElementById('toggle');
 const stateEl = document.getElementById('state');
-const runStateEl = document.getElementById('runstate');
-const cycleEl = document.getElementById('cycle');
-const lastMarker = document.getElementById('last');
+const state2El = document.getElementById('state2');
+const modeEl = document.getElementById('mode');
+const lastEl = document.getElementById('last');
 
-const BASE = 1.2;          // 下へゆっくり
-const REWIND_MULT = 3;     // ★ 巻き戻し 3倍速
+const BASE = 1.2;              // 基本速度
+const FORWARD_MULT = 3;        // ★進む：3倍
+const BACKSTEP_MULT = 3;       // ★小戻り：3倍
+const REWIND_MULT = 10;        // ★巻き戻し：10倍
 const EDGE = 20;
 
 let running=false;
 let mode='down';
+let y=0;
 let v=BASE;
 let targetV=BASE;
 let lastT=performance.now();
-let y=0;
 
 function maxScroll(){
   return document.documentElement.scrollHeight - innerHeight;
 }
 
-// ★ 最後の本が「下に見える」位置
-function lastVisibleY(){
-  const r = lastMarker.getBoundingClientRect();
-  const absY = window.scrollY + r.top;
-  return Math.min(absY - innerHeight * 0.6, maxScroll());
+function lastTriggerY(){
+  const r = lastEl.getBoundingClientRect();
+  const abs = scrollY + r.top;
+  return Math.min(abs - innerHeight*0.6, maxScroll());
 }
 
 function step(t){
   if(!running) return;
   const dt=(t-lastT)/1000; lastT=t;
 
-  if(mode==='down' && y>=lastVisibleY()){
+  if(mode==='down' && y>=lastTriggerY()){
     mode='rewind';
     targetV = -BASE * REWIND_MULT;
-    cycleEl.textContent='rewind';
+    modeEl.textContent='rewind';
   }
   if(mode==='rewind' && y<=EDGE){
     y=0;
     mode='down';
-    targetV = BASE;
-    cycleEl.textContent='down';
+    targetV = BASE * FORWARD_MULT;
+    modeEl.textContent='down';
   }
 
   v += (targetV - v) * 0.06;
@@ -157,9 +149,10 @@ function step(t){
 toggleBtn.onclick=()=>{
   running=!running;
   stateEl.textContent = running?'on':'off';
-  runStateEl.textContent = stateEl.textContent;
+  state2El.textContent = stateEl.textContent;
   if(running){
     y=scrollY;
+    targetV = BASE * FORWARD_MULT;
     lastT=performance.now();
     requestAnimationFrame(step);
   }
