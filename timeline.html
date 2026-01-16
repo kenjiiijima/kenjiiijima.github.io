@@ -111,6 +111,25 @@
       min-width: 190px;
     }
     .exp b{ color: var(--text); font-weight: 600; }
+
+    /* ===== 本を「遊ばせる」(ジグザグ横移動→戻る) ===== */
+    li.wiggle{
+      will-change: transform;
+      animation-name: wiggleZigzag;
+      animation-duration: var(--wiggle-dur, 3.6s);
+      animation-timing-function: ease-in-out;
+      animation-fill-mode: both;
+    }
+    @keyframes wiggleZigzag{
+      0%   { transform: translateX(0); }
+      12%  { transform: translateX(calc(var(--wiggle-amp, 26px) * 0.85)); }
+      24%  { transform: translateX(calc(var(--wiggle-amp, 26px) * -0.35)); }
+      38%  { transform: translateX(calc(var(--wiggle-amp, 26px) * 1.00)); }
+      55%  { transform: translateX(calc(var(--wiggle-amp, 26px) * -0.55)); }
+      72%  { transform: translateX(calc(var(--wiggle-amp, 26px) * 0.55)); }
+      86%  { transform: translateX(calc(var(--wiggle-amp, 26px) * -0.20)); }
+      100% { transform: translateX(0); }
+    }
   </style>
 </head>
 
@@ -205,7 +224,7 @@
   <div class="scroll-dummy" aria-hidden="true"></div>
 
   <div class="exp" id="exp">
-    <div><b>EXP 8</b></div>
+    <div><b>EXP 9</b></div>
     <div>mode: <span id="mode">down</span></div>
     <div>state: <span id="runstate">off</span></div>
     <div>y/max: <span id="pos">0</span>/<span id="max">0</span></div>
@@ -230,12 +249,21 @@
     const BASE = 1.2;
     const FORWARD_MULT = 10;   // 進む：10倍
     const BACKSTEP_MULT = 3;   // 小戻り：3倍
-    const REWIND_MULT = 30;    // 巻き戻し：30倍
+    const REWIND_MULT  = 30;   // 巻き戻し：30倍
     const WANDER = 0.30;       // 周期呼吸なし（微ゆらぎのみ）
+
     const PAUSE_CHANCE = 0.008;
     const BACKSTEP_CHANCE = 0.004;
     const MAX_BACKSTEP_PX = 90;
     const BACKSTEP_DURATION_MS = 650;
+
+    // ===== 本を遊ばせる（walk中ランダム） =====
+    const WIGGLE_CHANCE = 0.006;      // 低確率（フレーム単位）
+    const WIGGLE_COOLDOWN_MS = 900;   // 連発防止
+    const WIGGLE_MIN_MS = 3000;
+    const WIGGLE_MAX_MS = 4000;
+    const WIGGLE_MIN_PX = 16;
+    const WIGGLE_MAX_PX = 34;
 
     const EDGE_PAD = 10;
     const TRIGGER_PAD = 12;
@@ -243,6 +271,43 @@
 
     const clamp = (x,a,b)=>Math.max(a, Math.min(b,x));
     const rand = (a,b)=>a + Math.random()*(b-a);
+
+    const allItems = Array.from(document.querySelectorAll('main li'));
+    let wiggleBusy = false;
+    let lastWiggleAt = 0;
+
+    function wiggleOne(){
+      if (wiggleBusy) return;
+      const now = performance.now();
+      if (now - lastWiggleAt < WIGGLE_COOLDOWN_MS) return;
+      if (!allItems.length) return;
+
+      const el = allItems[Math.floor(Math.random() * allItems.length)];
+      if (!el) return;
+
+      wiggleBusy = true;
+      lastWiggleAt = now;
+
+      const dur = Math.round(rand(WIGGLE_MIN_MS, WIGGLE_MAX_MS));
+      const amp = Math.round(rand(WIGGLE_MIN_PX, WIGGLE_MAX_PX));
+      const dir = (Math.random() < 0.5) ? -1 : 1;
+
+      el.style.setProperty('--wiggle-dur', dur + 'ms');
+      el.style.setProperty('--wiggle-amp', (amp * dir) + 'px');
+
+      const cleanup = () => {
+        el.classList.remove('wiggle');
+        el.style.removeProperty('--wiggle-dur');
+        el.style.removeProperty('--wiggle-amp');
+        el.removeEventListener('animationend', cleanup);
+        wiggleBusy = false;
+      };
+
+      el.addEventListener('animationend', cleanup, { once:true });
+      el.classList.remove('wiggle'); // 再発火のため
+      void el.offsetWidth;
+      el.classList.add('wiggle');
+    }
 
     const maxScroll = () => {
       const doc = document.documentElement;
@@ -304,7 +369,6 @@
       updateDiag();
     }
 
-    // マウス操作で stop
     addEventListener('wheel', stop, {passive:true});
     addEventListener('mousedown', (e) => {
       if (e.target && e.target.closest && e.target.closest('#fab')) return;
@@ -324,6 +388,9 @@
 
       const mx = maxScroll();
       if (mx <= 0) { stop(); return; }
+
+      // walk中：ランダムに「本を遊ばせる」
+      if (Math.random() < WIGGLE_CHANCE) wiggleOne();
 
       if (mode === 'down') {
         if (y >= triggerY()) {
@@ -380,7 +447,7 @@
       if (turningOn) {
         ignoreStopUntil = performance.now() + IGNORE_STOP_MS;
 
-        // ★要求：停止していた時が巻き戻し中でも、OFF→ON では必ず前進から
+        // OFF→ON：必ず前進から開始
         mode = 'down';
         y = window.scrollY;
         lastT = performance.now();
