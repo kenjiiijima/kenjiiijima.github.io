@@ -17,30 +17,38 @@
                    "Hiragino Kaku Gothic ProN", "Yu Gothic", "Meiryo",
                    "Noto Sans JP", sans-serif;
       letter-spacing: 0.01em;
+      line-height: 1.55;
     }
+
     main{
       max-width: 760px;
       margin-left: auto;
       margin-right: auto;
       padding: 44px 18px 96px;
     }
+
+    /* H1相当（Markdownの # ） */
     h1{
       font-size: 16px;
       font-weight: 600;
       margin: 0 0 14px;
       letter-spacing: 0.02em;
     }
+
     hr{
       border:none;
       border-top:1px solid var(--rule);
       margin: 16px 0 18px;
     }
+
     h2{
       font-size: 13px;
       font-weight: 600;
       color: var(--muted);
       margin: 22px 0 10px;
+      letter-spacing: 0.02em;
     }
+
     ul{ margin: 0 0 0 1.15em; padding:0; }
     li{ margin: 6px 0; }
 
@@ -51,6 +59,16 @@
     a:hover{
       text-decoration: underline;
       text-decoration-color: rgba(0,0,0,0.25);
+    }
+
+    /* 「リンクに見せすぎない」トップのリンク */
+    a.stealth{
+      color: var(--text);
+      text-decoration: none;
+    }
+    a.stealth:hover{
+      text-decoration: underline;
+      text-decoration-color: rgba(0,0,0,0.22);
     }
 
     /* 右下：walk トグル（静か） */
@@ -92,13 +110,11 @@
 </head>
 <body>
   <main>
-    <h1>timeline</h1>
-
-    <div><a href="record-2026-01-15.html">record 2026-01-15</a></div>
+    <!-- # [年表（確認用）](record-2026-01-15.html) を再現 -->
+    <h1><a class="stealth" href="record-2026-01-15.html">年表（確認用）</a></h1>
 
     <hr>
 
-    <!-- ここは timeline.md を HTML に写していく領域（必要なら今後自動化も可） -->
     <h2>前8世紀頃</h2>
     <ul>
       <li>イリアス　［制作中］</li>
@@ -117,15 +133,98 @@
       <li>国家　［制作中］</li>
     </ul>
 
+    <h2>1687</h2>
+    <ul>
+      <li>プリンキピア　［制作中］</li>
+    </ul>
+
+    <h2>1781</h2>
+    <ul>
+      <li>純粋理性批判　［制作中］</li>
+    </ul>
+
+    <h2>1790</h2>
+    <ul>
+      <li>判断力批判　［制作中］</li>
+    </ul>
+
+    <h2>1807</h2>
+    <ul>
+      <li>精神現象学　［制作中］</li>
+    </ul>
+
+    <h2>1812</h2>
+    <ul>
+      <li>論理学（第一巻）　［制作中］</li>
+    </ul>
+
+    <h2>1844</h2>
+    <ul>
+      <li>経済学・哲学草稿　［制作中］</li>
+    </ul>
+
+    <h2>1859</h2>
+    <ul>
+      <li>種の起源　［制作中］</li>
+    </ul>
+
+    <h2>1886</h2>
+    <ul>
+      <li>善悪の彼岸　［制作中］</li>
+    </ul>
+
+    <h2>1900</h2>
+    <ul>
+      <li>論理哲学論考（草）　［制作中］</li>
+      <li>数学原理（抄）　［制作中］</li>
+    </ul>
+
+    <h2>1927</h2>
+    <ul>
+      <li>存在と時間　［制作中］</li>
+    </ul>
+
+    <h2>1929</h2>
+    <ul>
+      <li>過程と実在　［制作中］</li>
+    </ul>
+
+    <h2>1936</h2>
+    <ul>
+      <li>芸術作品の複製技術時代　［制作中］</li>
+      <li>科学革命の構造（草）　［制作中］</li>
+    </ul>
+
+    <h2>1953</h2>
+    <ul>
+      <li>哲学探究　［制作中］</li>
+      <li>方法序説（再読）　［制作中］</li>
+    </ul>
+
+    <h2>1958</h2>
+    <ul>
+      <li>物理学と哲学　［制作中］</li>
+    </ul>
+
+    <h2>2025</h2>
+    <ul>
+      <li>原典翻訳プロジェクト（断片）　［制作中］</li>
+      <li>科学と哲学のあいだ（草）　［制作中］</li>
+    </ul>
+
     <h2>2026</h2>
     <ul>
+      <li>物とは何か（原稿）　［制作中］</li>
+      <li>哲学者たちは、物をどう捉えてきたのか（原稿）　［制作中］</li>
+      <li>本_倫理（構想）　［制作中］</li>
       <li>対話記録：AIと哲学（断片）　［制作中］</li>
+      <li>散歩の記録（断片）　［制作中］</li>
     </ul>
   </main>
 
   <!-- 右下：walk トグル -->
   <div class="fab" id="fab">
-    <button id="toggle">walk</button>
+    <button id="toggle" aria-label="walk toggle">walk</button>
     <span class="state" id="state">off</span>
   </div>
 
@@ -144,14 +243,14 @@
     }
 
     // ====== 調整パラメータ（ここだけ触ればOK） ======
-    const BASE_PX_PER_SEC = 12;      // もっと遅く→ 10 / 8
-    const WANDER = 0.65;             // 歩調のゆらぎ
+    const BASE_PX_PER_SEC = 12;      // 基本速度（ゆっくり）
+    const WANDER = 0.65;             // 歩調のゆらぎ（0〜1）
     const PAUSE_CHANCE = 0.012;      // 立ち止まり頻度
     const BACKSTEP_CHANCE = 0.004;   // 後戻り頻度
     const MAX_BACKSTEP_PX = 90;      // 後戻り最大量
     const MIN_PAUSE_MS = 450;
     const MAX_PAUSE_MS = 2300;
-    const EDGE_PADDING_PX = 10;
+    const EDGE_PADDING_PX = 10;      // 下端停止の余白
     // ================================================
 
     let running = false;
@@ -170,7 +269,7 @@
       stateEl.textContent = 'off';
     };
 
-    // ユーザーが触れたら停止（思想的に必須）
+    // ユーザーが触れたら停止
     window.addEventListener('wheel', stop, { passive:true });
     window.addEventListener('touchstart', stop, { passive:true });
     window.addEventListener('keydown', stop);
@@ -192,8 +291,8 @@
       const top = window.scrollY;
       const maxTop = maxScrollTop();
 
-      // 端なら静かに停止（無限ループにしない）
-      if (top <= EDGE_PADDING_PX || top >= maxTop - EDGE_PADDING_PX) {
+      // ★重要：先頭(top=0)では停止しない。下端だけ静かに停止する。
+      if (top >= maxTop - EDGE_PADDING_PX) {
         stop();
         return;
       }
