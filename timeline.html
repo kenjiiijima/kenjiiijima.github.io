@@ -4,8 +4,8 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>timeline</title>
-  <style>
 
+  <style>
     :root{
       --bg:#fff;
       --text: rgba(0,0,0,0.90);
@@ -27,10 +27,6 @@
       margin-right: auto;
       padding: 44px 18px 96px;
     }
-
-    .scroll-dummy{
-  height: 1200px;   /* 実験用：あとで消す */
-}
 
     h1{
       font-size: 16px;
@@ -56,30 +52,26 @@
     ul{ margin: 0 0 0 1.15em; padding:0; }
     li{ margin: 6px 0; }
 
-    a{
-      color: var(--text);
-      text-decoration: none;
-    }
+    a{ color: var(--text); text-decoration: none; }
     a:hover{
       text-decoration: underline;
       text-decoration-color: rgba(0,0,0,0.25);
     }
-
-    a.stealth{
-      color: var(--text);
-      text-decoration: none;
-    }
+    a.stealth{ color: var(--text); text-decoration: none; }
     a.stealth:hover{
       text-decoration: underline;
       text-decoration-color: rgba(0,0,0,0.22);
     }
 
-    /* 右下：walk トグル（静か） */
+    /* 実験用：確実にスクロール余地を作る（動作確認後に消してOK） */
+    .scroll-dummy{ height: 1400px; }
+
+    /* 右下：walk トグル */
     .fab{
       position: fixed;
       right: 14px;
       bottom: 14px;
-      z-index: 999999; /* かぶり対策で強め */
+      z-index: 999999;
       display: inline-flex;
       gap: 10px;
       align-items: center;
@@ -110,7 +102,7 @@
       font-variant-numeric: tabular-nums;
     }
 
-    /* 右上：実験番号＆自己診断（EXP 2） */
+    /* 右上：実験番号＆診断（EXP 3） */
     .exp{
       position: fixed;
       top: 12px;
@@ -126,13 +118,16 @@
       line-height: 1.35;
       user-select: none;
       font-variant-numeric: tabular-nums;
-      min-width: 170px;
+      min-width: 190px;
     }
     .exp b{ color: var(--text); font-weight: 600; }
+
   </style>
 </head>
+
 <body>
   <main>
+    <!-- timeline.md の先頭 # [年表（確認用）](record-2026-01-15.html) を再現 -->
     <h1><a class="stealth" href="record-2026-01-15.html">年表（確認用）</a></h1>
     <hr>
 
@@ -143,9 +138,7 @@
     </ul>
 
     <h2>前7世紀</h2>
-    <ul>
-      <li>神統記　［制作中］</li>
-    </ul>
+    <ul><li>神統記　［制作中］</li></ul>
 
     <h2>前4世紀</h2>
     <ul>
@@ -221,23 +214,27 @@
     </ul>
   </main>
 
+  <!-- 実験用：スクロール余地 -->
+  <div class="scroll-dummy" aria-hidden="true"></div>
+
   <!-- 右上：実験番号＆診断 -->
   <div class="exp" id="exp">
-    <div><b>EXP 2</b></div>
+    <div><b>EXP 3</b></div>
     <div>JS: <span id="jsok">…</span></div>
     <div>click: <span id="clicks">0</span></div>
     <div>state: <span id="runstate">off</span></div>
     <div>y/max: <span id="pos">0</span>/<span id="max">0</span></div>
   </div>
 
-  <!-- 右下：walk トグル -->
+  <!-- 右下：walk -->
   <div class="fab" id="fab">
-    <button id="toggle" type="button" aria-label="walk toggle">walk</button>
+    <button id="toggle" type="button">walk</button>
     <span class="state" id="state">off</span>
   </div>
- <div class="scroll-dummy"></div>
+
   <script>
   (() => {
+    // ===== 診断UI =====
     const jsok = document.getElementById('jsok');
     const clicksEl = document.getElementById('clicks');
     const runStateEl = document.getElementById('runstate');
@@ -246,19 +243,33 @@
 
     jsok.textContent = 'OK';
 
+    // ===== walk UI =====
     const toggleBtn = document.getElementById('toggle');
     const stateEl = document.getElementById('state');
 
-    // ====== 調整パラメータ ======
-    const BASE_PX_PER_SEC = 12;
-    const WANDER = 0.65;
-    const PAUSE_CHANCE = 0.012;
-    const BACKSTEP_CHANCE = 0.004;
-    const MAX_BACKSTEP_PX = 90;
+    // ====== 調整パラメータ（ここだけ触ればOK） ======
+    const BASE_PX_PER_SEC = 12;      // 基本速度
+    const WANDER = 0.65;             // ゆらぎ
+    const PAUSE_CHANCE = 0.012;      // 立ち止まり頻度
+    const BACKSTEP_CHANCE = 0.004;   // 後戻り頻度
+    const MAX_BACKSTEP_PX = 90;      // 後戻り最大
     const MIN_PAUSE_MS = 450;
     const MAX_PAUSE_MS = 2300;
-    const EDGE_PADDING_PX = 10;
-    // ============================
+    const EDGE_PADDING_PX = 10;      // 下端停止余白
+    // ================================================
+
+    const clamp = (x,a,b) => Math.max(a, Math.min(b,x));
+    const rand = (a,b) => a + Math.random()*(b-a);
+
+    // ★重要：毎回「いまの」maxを計算する（キャッシュしない）
+    const maxScrollTop = () => {
+      const doc = document.documentElement;
+      const h = Math.max(
+        doc.scrollHeight,
+        document.body ? document.body.scrollHeight : 0
+      );
+      return Math.max(0, h - window.innerHeight);
+    };
 
     let running = false;
     let pausedUntil = 0;
@@ -267,15 +278,9 @@
     let v = BASE_PX_PER_SEC;
     let clickCount = 0;
 
-    const clamp = (x,a,b) => Math.max(a, Math.min(b,x));
-    const rand = (a,b) => a + Math.random()*(b-a);
-    const maxScrollTop = () => Math.max(0, document.documentElement.scrollHeight - window.innerHeight);
-
     function updateDiag(){
-      const top = Math.round(window.scrollY);
-      const mx = Math.round(maxScrollTop());
-      posEl.textContent = String(top);
-      maxEl.textContent = String(mx);
+      posEl.textContent = String(Math.round(window.scrollY));
+      maxEl.textContent = String(Math.round(maxScrollTop()));
       runStateEl.textContent = running ? 'on' : 'off';
     }
     updateDiag();
@@ -289,7 +294,7 @@
       updateDiag();
     };
 
-    // ユーザーが触れたら停止
+    // ユーザー操作で即停止
     window.addEventListener('wheel', stop, { passive:true });
     window.addEventListener('touchstart', stop, { passive:true });
     window.addEventListener('keydown', stop);
@@ -310,6 +315,12 @@
 
       const top = window.scrollY;
       const mx = maxScrollTop();
+
+      // スクロール余地がないなら即停止（診断用に明示）
+      if (mx <= 0) {
+        stop();
+        return;
+      }
 
       // 下端だけ静かに停止（先頭は止めない）
       if (top >= mx - EDGE_PADDING_PX) {
@@ -336,6 +347,7 @@
         return;
       }
 
+      // なめらか追従
       const follow = 0.06;
       v = v + (targetV - v) * follow;
 
@@ -357,7 +369,7 @@
       }
     }
 
-    // クリックが確実に拾えるように二重で仕掛ける
+    // クリックが必ず拾えるように二重で設定
     toggleBtn.addEventListener('click', toggle);
     toggleBtn.onclick = toggle;
   })();
