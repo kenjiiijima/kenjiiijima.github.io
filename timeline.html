@@ -244,8 +244,8 @@
     const toggleBtn = document.getElementById('toggle');
     const stateEl = document.getElementById('state');
 
-    // ====== 調整パラメータ（元に戻す） ======
-    const BASE_PX_PER_SEC = 12;      // ← 元の速度
+    // ====== 調整パラメータ（速度を 1/10 でも動く版） ======
+    const BASE_PX_PER_SEC = 1.2;     // ★ 12 の 1/10
     const WANDER = 0.65;             // ゆらぎ
     const PAUSE_CHANCE = 0.012;      // 立ち止まり頻度
     const BACKSTEP_CHANCE = 0.004;   // 後戻り頻度
@@ -253,7 +253,7 @@
     const MIN_PAUSE_MS = 450;
     const MAX_PAUSE_MS = 2300;
     const EDGE_PADDING_PX = 10;      // 下端停止余白
-    // =========================================
+    // =====================================================
 
     const clamp = (x,a,b) => Math.max(a, Math.min(b,x));
     const rand  = (a,b) => a + Math.random()*(b-a);
@@ -273,6 +273,9 @@
     let targetV = BASE_PX_PER_SEC;
     let v = BASE_PX_PER_SEC;
     let clickCount = 0;
+
+    // ★小数の移動量を蓄積する（遅い速度でも必ず動く）
+    let virtualY = 0;
 
     // walk ON 直後の誤停止を防ぐ猶予
     let ignoreStopUntil = 0;
@@ -322,11 +325,11 @@
       const dt = (t - lastT) / 1000;
       lastT = t;
 
-      const top = window.scrollY;
       const mx = maxScrollTop();
-
       if (mx <= 0) { stop(); return; }
-      if (top >= mx - EDGE_PADDING_PX) { stop(); return; }
+
+      // ★実スクロール値ではなく virtualY を基準に進める
+      if (virtualY >= mx - EDGE_PADDING_PX) { stop(); return; }
 
       if (t < pausedUntil) { requestAnimationFrame(step); return; }
 
@@ -338,7 +341,8 @@
 
       if (Math.random() < BACKSTEP_CHANCE) {
         const back = rand(20, MAX_BACKSTEP_PX);
-        window.scrollTo(0, clamp(top - back, 0, mx));
+        virtualY = clamp(virtualY - back, 0, mx);
+        window.scrollTo(0, Math.round(virtualY));
         pausedUntil = t + rand(260, 900);
         requestAnimationFrame(step);
         return;
@@ -347,7 +351,8 @@
       const follow = 0.06;
       v = v + (targetV - v) * follow;
 
-      window.scrollTo(0, clamp(top + v * dt, 0, mx));
+      virtualY = clamp(virtualY + v * dt, 0, mx);
+      window.scrollTo(0, Math.round(virtualY)); // ★整数で確実に動かす
       requestAnimationFrame(step);
     }
 
@@ -358,12 +363,10 @@
       running = !running;
 
       if (running) {
-        // ON直後に wheel 等が混ざっても止まらないように
         ignoreStopUntil = performance.now() + 350;
 
-        // 開始位置を一度だけ確定（白画面対策）
-        const y0 = window.scrollY;
-        window.scrollTo(0, y0);
+        // ★開始時に virtualY を現在位置で初期化（白画面/飛び防止）
+        virtualY = window.scrollY;
 
         lastT = performance.now();
         requestAnimationFrame(step);
