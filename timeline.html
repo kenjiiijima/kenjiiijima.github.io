@@ -290,6 +290,8 @@
     window.addEventListener('resize', updateDiag);
 
     const stop = () => {
+            console.log('[STOP] fired by', (new Error()).stack.split('\n')[2]?.trim());
+
       if (!running) return;
       running = false;
       stateEl.textContent = 'off';
