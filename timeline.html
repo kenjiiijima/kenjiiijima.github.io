@@ -57,9 +57,16 @@
       text-decoration: underline;
       text-decoration-color: rgba(0,0,0,0.25);
     }
+    a.stealth{ color: var(--text); text-decoration: none; }
+    a.stealth:hover{
+      text-decoration: underline;
+      text-decoration-color: rgba(0,0,0,0.22);
+    }
 
+    /* 実験用：確実にスクロール余地を作る（動作確認後に消してOK） */
     .scroll-dummy{ height: 1400px; }
 
+    /* 右下：walk トグル */
     .fab{
       position: fixed;
       right: 14px;
@@ -87,7 +94,15 @@
       cursor: pointer;
       letter-spacing: 0.02em;
     }
+    .fab button:hover{
+      text-decoration: underline;
+      text-decoration-color: rgba(0,0,0,0.25);
+    }
+    .fab .state{
+      font-variant-numeric: tabular-nums;
+    }
 
+    /* 右上：実験番号＆診断（EXP 3） */
     .exp{
       position: fixed;
       top: 12px;
@@ -97,16 +112,22 @@
       border: 1px solid rgba(0,0,0,0.12);
       border-radius: 12px;
       background: rgba(255,255,255,0.92);
+      backdrop-filter: blur(6px);
       font-size: 12px;
       color: var(--muted);
+      line-height: 1.35;
+      user-select: none;
+      font-variant-numeric: tabular-nums;
       min-width: 190px;
     }
+    .exp b{ color: var(--text); font-weight: 600; }
   </style>
 </head>
 
 <body>
   <main>
-    <h1>年表（確認用）</h1>
+    <!-- timeline.md の先頭 # [年表（確認用）](record-2026-01-15.html) を再現 -->
+    <h1><a class="stealth" href="record-2026-01-15.html">年表（確認用）</a></h1>
     <hr>
 
     <h2>前8世紀頃</h2>
@@ -115,54 +136,156 @@
       <li>オデュッセイア　［制作中］</li>
     </ul>
 
+    <h2>前7世紀</h2>
+    <ul><li>神統記　［制作中］</li></ul>
+
+    <h2>前4世紀</h2>
+    <ul>
+      <li>ティマイオス　［制作中］</li>
+      <li>形而上学　［制作中］</li>
+      <li>国家　［制作中］</li>
+    </ul>
+
+    <h2>1687</h2>
+    <ul><li>プリンキピア　［制作中］</li></ul>
+
+    <h2>1781</h2>
+    <ul><li>純粋理性批判　［制作中］</li></ul>
+
+    <h2>1790</h2>
+    <ul><li>判断力批判　［制作中］</li></ul>
+
+    <h2>1807</h2>
+    <ul><li>精神現象学　［制作中］</li></ul>
+
+    <h2>1812</h2>
+    <ul><li>論理学（第一巻）　［制作中］</li></ul>
+
+    <h2>1844</h2>
+    <ul><li>経済学・哲学草稿　［制作中］</li></ul>
+
+    <h2>1859</h2>
+    <ul><li>種の起源　［制作中］</li></ul>
+
+    <h2>1886</h2>
+    <ul><li>善悪の彼岸　［制作中］</li></ul>
+
+    <h2>1900</h2>
+    <ul>
+      <li>論理哲学論考（草）　［制作中］</li>
+      <li>数学原理（抄）　［制作中］</li>
+    </ul>
+
+    <h2>1927</h2>
+    <ul><li>存在と時間　［制作中］</li></ul>
+
+    <h2>1929</h2>
+    <ul><li>過程と実在　［制作中］</li></ul>
+
+    <h2>1936</h2>
+    <ul>
+      <li>芸術作品の複製技術時代　［制作中］</li>
+      <li>科学革命の構造（草）　［制作中］</li>
+    </ul>
+
+    <h2>1953</h2>
+    <ul>
+      <li>哲学探究　［制作中］</li>
+      <li>方法序説（再読）　［制作中］</li>
+    </ul>
+
+    <h2>1958</h2>
+    <ul><li>物理学と哲学　［制作中］</li></ul>
+
+    <h2>2025</h2>
+    <ul>
+      <li>原典翻訳プロジェクト（断片）　［制作中］</li>
+      <li>科学と哲学のあいだ（草）　［制作中］</li>
+    </ul>
+
     <h2>2026</h2>
     <ul>
       <li>物とは何か（原稿）　［制作中］</li>
       <li>哲学者たちは、物をどう捉えてきたのか（原稿）　［制作中］</li>
+      <li>本_倫理（構想）　［制作中］</li>
+      <li>対話記録：AIと哲学（断片）　［制作中］</li>
+      <li>散歩の記録（断片）　［制作中］</li>
     </ul>
   </main>
 
+  <!-- 実験用：スクロール余地 -->
   <div class="scroll-dummy" aria-hidden="true"></div>
 
-  <div class="exp">
+  <!-- 右上：実験番号＆診断 -->
+  <div class="exp" id="exp">
+    <div><b>EXP 3</b></div>
+    <div>JS: <span id="jsok">…</span></div>
+    <div>click: <span id="clicks">0</span></div>
     <div>state: <span id="runstate">off</span></div>
     <div>y/max: <span id="pos">0</span>/<span id="max">0</span></div>
   </div>
 
-  <div class="fab">
-    <button id="toggle">walk</button>
+  <!-- 右下：walk -->
+  <div class="fab" id="fab">
+    <button id="toggle" type="button">walk</button>
     <span class="state" id="state">off</span>
   </div>
 
   <script>
-    /* ========= 状態 ========= */
-    let running = false;
-    let lastT = performance.now();
-    let ignoreStopUntil = 0;
-
-    const stateEl = document.getElementById('state');
+    // ===== 診断UI =====
+    const jsok = document.getElementById('jsok');
+    const clicksEl = document.getElementById('clicks');
     const runStateEl = document.getElementById('runstate');
     const posEl = document.getElementById('pos');
     const maxEl = document.getElementById('max');
+    jsok.textContent = 'OK';
+
+    // ===== walk UI =====
     const toggleBtn = document.getElementById('toggle');
+    const stateEl = document.getElementById('state');
 
-    /* ========= 速度設定（★1/10） ========= */
-    const BASE_PX_PER_SEC = 1.2;   // ← 以前の 12 → 1.2
-    const EDGE_PADDING_PX = 10;
+    // ====== 調整パラメータ（元に戻す） ======
+    const BASE_PX_PER_SEC = 12;      // ← 元の速度
+    const WANDER = 0.65;             // ゆらぎ
+    const PAUSE_CHANCE = 0.012;      // 立ち止まり頻度
+    const BACKSTEP_CHANCE = 0.004;   // 後戻り頻度
+    const MAX_BACKSTEP_PX = 90;      // 後戻り最大
+    const MIN_PAUSE_MS = 450;
+    const MAX_PAUSE_MS = 2300;
+    const EDGE_PADDING_PX = 10;      // 下端停止余白
+    // =========================================
 
-    const clamp = (x,a,b)=>Math.max(a,Math.min(b,x));
-    const maxScrollTop = ()=>{
-      const d=document.documentElement;
-      return Math.max(0, d.scrollHeight - window.innerHeight);
+    const clamp = (x,a,b) => Math.max(a, Math.min(b,x));
+    const rand  = (a,b) => a + Math.random()*(b-a);
+
+    const maxScrollTop = () => {
+      const doc = document.documentElement;
+      const h = Math.max(
+        doc.scrollHeight,
+        document.body ? document.body.scrollHeight : 0
+      );
+      return Math.max(0, h - window.innerHeight);
     };
+
+    let running = false;
+    let pausedUntil = 0;
+    let lastT = performance.now();
+    let targetV = BASE_PX_PER_SEC;
+    let v = BASE_PX_PER_SEC;
+    let clickCount = 0;
+
+    // walk ON 直後の誤停止を防ぐ猶予
+    let ignoreStopUntil = 0;
 
     function updateDiag(){
       stateEl.textContent = running ? 'on' : 'off';
+      posEl.textContent = String(Math.round(window.scrollY));
+      maxEl.textContent = String(Math.round(maxScrollTop()));
       runStateEl.textContent = running ? 'on' : 'off';
-      posEl.textContent = Math.round(window.scrollY);
-      maxEl.textContent = Math.round(maxScrollTop());
     }
     updateDiag();
+    window.addEventListener('scroll', updateDiag, { passive:true });
+    window.addEventListener('resize', updateDiag);
 
     function stop(){
       if (performance.now() < ignoreStopUntil) return;
@@ -170,6 +293,28 @@
       running = false;
       updateDiag();
     }
+
+    // ユーザー操作で即停止（walk 操作自体は止めない）
+    window.addEventListener('wheel', stop, { passive:true });
+
+    window.addEventListener('touchstart', (e) => {
+      if (e.target && e.target.closest && e.target.closest('#fab')) return;
+      stop();
+    }, { passive:true });
+
+    window.addEventListener('keydown', stop);
+
+    window.addEventListener('mousedown', (e) => {
+      if (e.target && e.target.closest && e.target.closest('#fab')) return;
+      stop();
+    });
+
+    const retarget = () => {
+      const wiggle = 1 + rand(-WANDER, WANDER);
+      targetV = BASE_PX_PER_SEC * wiggle;
+    };
+    retarget();
+    setInterval(retarget, 1800);
 
     function step(t){
       if (!running) return;
@@ -180,17 +325,46 @@
       const top = window.scrollY;
       const mx = maxScrollTop();
 
+      if (mx <= 0) { stop(); return; }
       if (top >= mx - EDGE_PADDING_PX) { stop(); return; }
 
-      window.scrollTo(0, clamp(top + BASE_PX_PER_SEC * dt, 0, mx));
+      if (t < pausedUntil) { requestAnimationFrame(step); return; }
+
+      if (Math.random() < PAUSE_CHANCE) {
+        pausedUntil = t + rand(MIN_PAUSE_MS, MAX_PAUSE_MS);
+        requestAnimationFrame(step);
+        return;
+      }
+
+      if (Math.random() < BACKSTEP_CHANCE) {
+        const back = rand(20, MAX_BACKSTEP_PX);
+        window.scrollTo(0, clamp(top - back, 0, mx));
+        pausedUntil = t + rand(260, 900);
+        requestAnimationFrame(step);
+        return;
+      }
+
+      const follow = 0.06;
+      v = v + (targetV - v) * follow;
+
+      window.scrollTo(0, clamp(top + v * dt, 0, mx));
       requestAnimationFrame(step);
     }
 
     function toggle(){
+      clickCount += 1;
+      clicksEl.textContent = String(clickCount);
+
       running = !running;
 
       if (running) {
-        ignoreStopUntil = performance.now() + 300;
+        // ON直後に wheel 等が混ざっても止まらないように
+        ignoreStopUntil = performance.now() + 350;
+
+        // 開始位置を一度だけ確定（白画面対策）
+        const y0 = window.scrollY;
+        window.scrollTo(0, y0);
+
         lastT = performance.now();
         requestAnimationFrame(step);
       }
@@ -199,4 +373,6 @@
     }
 
     toggleBtn.addEventListener('click', toggle);
-    window.addEventListener('wheel', st
+  </script>
+</body>
+</html>
