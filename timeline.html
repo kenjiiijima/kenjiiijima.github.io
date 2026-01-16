@@ -23,141 +23,180 @@
 
     main{
       max-width: 760px;
-      margin: auto;
+      margin-left: auto;
+      margin-right: auto;
       padding: 44px 18px 96px;
     }
 
-    h1{ font-size:16px; margin:0 0 14px; }
-    h2{ font-size:13px; color:var(--muted); margin:22px 0 10px; }
-    hr{ border:none; border-top:1px solid var(--rule); margin:16px 0; }
-    ul{ margin:0 0 0 1.15em; padding:0; }
-    li{ margin:6px 0; }
+    h1{
+      font-size: 16px;
+      font-weight: 600;
+      margin: 0 0 14px;
+      letter-spacing: 0.02em;
+    }
 
-    .scroll-dummy{ height:1400px; }
+    hr{
+      border:none;
+      border-top:1px solid var(--rule);
+      margin: 16px 0 18px;
+    }
+
+    h2{
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--muted);
+      margin: 22px 0 10px;
+      letter-spacing: 0.02em;
+    }
+
+    ul{ margin: 0 0 0 1.15em; padding:0; }
+    li{ margin: 6px 0; }
+
+    a{ color: var(--text); text-decoration: none; }
+    a:hover{
+      text-decoration: underline;
+      text-decoration-color: rgba(0,0,0,0.25);
+    }
+
+    .scroll-dummy{ height: 1400px; }
 
     .fab{
-      position:fixed; right:14px; bottom:14px;
-      z-index:9999;
-      display:flex; gap:10px; align-items:center;
-      padding:10px 12px;
-      border:1px solid rgba(0,0,0,0.12);
-      border-radius:999px;
-      background:rgba(255,255,255,0.92);
-      font-size:12.5px;
+      position: fixed;
+      right: 14px;
+      bottom: 14px;
+      z-index: 999999;
+      display: inline-flex;
+      gap: 10px;
+      align-items: center;
+      padding: 10px 12px;
+      border: 1px solid rgba(0,0,0,0.12);
+      border-radius: 999px;
+      background: rgba(255,255,255,0.92);
+      backdrop-filter: blur(6px);
+      font-size: 12.5px;
+      color: var(--muted);
+      user-select: none;
     }
     .fab button{
-      border:none; background:none; cursor:pointer;
-      font:inherit;
+      border: none;
+      background: transparent;
+      padding: 0;
+      margin: 0;
+      font: inherit;
+      color: var(--text);
+      cursor: pointer;
+      letter-spacing: 0.02em;
     }
 
     .exp{
-      position:fixed; top:12px; right:12px;
-      z-index:9999;
-      padding:10px 12px;
-      border:1px solid rgba(0,0,0,0.12);
-      border-radius:12px;
-      background:rgba(255,255,255,0.92);
-      font-size:12px;
-      min-width:180px;
+      position: fixed;
+      top: 12px;
+      right: 12px;
+      z-index: 999999;
+      padding: 10px 12px;
+      border: 1px solid rgba(0,0,0,0.12);
+      border-radius: 12px;
+      background: rgba(255,255,255,0.92);
+      font-size: 12px;
+      color: var(--muted);
+      min-width: 190px;
     }
   </style>
 </head>
 
 <body>
-<main>
-  <h1>年表（確認用）</h1>
-  <hr>
-  <h2>前8世紀頃</h2>
-  <ul><li>イリアス</li><li>オデュッセイア</li></ul>
-  <h2>2026</h2>
-  <ul><li>物とは何か（原稿）</li></ul>
-</main>
+  <main>
+    <h1>年表（確認用）</h1>
+    <hr>
 
-<div class="scroll-dummy"></div>
+    <h2>前8世紀頃</h2>
+    <ul>
+      <li>イリアス　［制作中］</li>
+      <li>オデュッセイア　［制作中］</li>
+    </ul>
 
-<div class="exp">
-  <div>state: <span id="runstate">off</span></div>
-  <div>y/max: <span id="pos">0</span>/<span id="max">0</span></div>
-</div>
+    <h2>2026</h2>
+    <ul>
+      <li>物とは何か（原稿）　［制作中］</li>
+      <li>哲学者たちは、物をどう捉えてきたのか（原稿）　［制作中］</li>
+    </ul>
+  </main>
 
-<div class="fab">
-  <button id="toggle">walk</button>
-  <span id="state">off</span>
-</div>
+  <div class="scroll-dummy" aria-hidden="true"></div>
 
-<script>
-/* ========= 基本状態 ========= */
-let running = false;
-let lastT = performance.now();
-let ignoreStopUntil = 0;
+  <div class="exp">
+    <div>state: <span id="runstate">off</span></div>
+    <div>y/max: <span id="pos">0</span>/<span id="max">0</span></div>
+  </div>
 
-const stateEl = document.getElementById('state');
-const runStateEl = document.getElementById('runstate');
-const posEl = document.getElementById('pos');
-const maxEl = document.getElementById('max');
-const toggleBtn = document.getElementById('toggle');
+  <div class="fab">
+    <button id="toggle">walk</button>
+    <span class="state" id="state">off</span>
+  </div>
 
-/* ========= util ========= */
-const clamp = (x,a,b)=>Math.max(a,Math.min(b,x));
-const maxScrollTop = ()=>{
-  const d=document.documentElement;
-  return Math.max(0, d.scrollHeight - window.innerHeight);
-};
+  <script>
+    /* ========= 状態 ========= */
+    let running = false;
+    let lastT = performance.now();
+    let ignoreStopUntil = 0;
 
-/* ========= UI更新 ========= */
-function updateDiag(){
-  stateEl.textContent = running ? 'on' : 'off';
-  runStateEl.textContent = running ? 'on' : 'off';
-  posEl.textContent = Math.round(window.scrollY);
-  maxEl.textContent = Math.round(maxScrollTop());
-}
-updateDiag();
+    const stateEl = document.getElementById('state');
+    const runStateEl = document.getElementById('runstate');
+    const posEl = document.getElementById('pos');
+    const maxEl = document.getElementById('max');
+    const toggleBtn = document.getElementById('toggle');
 
-/* ========= stop ========= */
-function stop(){
-  if (performance.now() < ignoreStopUntil) return;
-  if (!running) return;
-  running = false;
-  updateDiag();
-}
+    /* ========= 速度設定（★1/10） ========= */
+    const BASE_PX_PER_SEC = 1.2;   // ← 以前の 12 → 1.2
+    const EDGE_PADDING_PX = 10;
 
-/* ========= step ========= */
-function step(t){
-  if (!running) return;
+    const clamp = (x,a,b)=>Math.max(a,Math.min(b,x));
+    const maxScrollTop = ()=>{
+      const d=document.documentElement;
+      return Math.max(0, d.scrollHeight - window.innerHeight);
+    };
 
-  const dt = (t - lastT) / 1000;
-  lastT = t;
+    function updateDiag(){
+      stateEl.textContent = running ? 'on' : 'off';
+      runStateEl.textContent = running ? 'on' : 'off';
+      posEl.textContent = Math.round(window.scrollY);
+      maxEl.textContent = Math.round(maxScrollTop());
+    }
+    updateDiag();
 
-  const top = window.scrollY;
-  const mx = maxScrollTop();
-  if (top >= mx) { stop(); return; }
+    function stop(){
+      if (performance.now() < ignoreStopUntil) return;
+      if (!running) return;
+      running = false;
+      updateDiag();
+    }
 
-  window.scrollTo(0, clamp(top + 20*dt, 0, mx));
-  requestAnimationFrame(step);
-}
+    function step(t){
+      if (!running) return;
 
-/* ========= toggle ========= */
-function toggle(){
-  running = !running;
+      const dt = (t - lastT) / 1000;
+      lastT = t;
 
-  if (running) {
-    ignoreStopUntil = performance.now() + 300;
-    const y0 = window.scrollY;
-    window.scrollTo(0, y0);
-    lastT = performance.now();
-    requestAnimationFrame(step);
-  }
+      const top = window.scrollY;
+      const mx = maxScrollTop();
 
-  updateDiag();
-}
+      if (top >= mx - EDGE_PADDING_PX) { stop(); return; }
 
-/* ========= events ========= */
-toggleBtn.addEventListener('click', toggle);
-window.addEventListener('wheel', stop, {passive:true});
-window.addEventListener('keydown', stop);
-window.addEventListener('mousedown', e=>{
-  if (!e.target.closest('.fab')) stop();
-});
-</script>
-</body>
-</html>
+      window.scrollTo(0, clamp(top + BASE_PX_PER_SEC * dt, 0, mx));
+      requestAnimationFrame(step);
+    }
+
+    function toggle(){
+      running = !running;
+
+      if (running) {
+        ignoreStopUntil = performance.now() + 300;
+        lastT = performance.now();
+        requestAnimationFrame(step);
+      }
+
+      updateDiag();
+    }
+
+    toggleBtn.addEventListener('click', toggle);
+    window.addEventListener('wheel', st
