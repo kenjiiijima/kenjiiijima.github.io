@@ -292,6 +292,7 @@
 
     const stop = () => {
             //console.log('[STOP] fired by', (new Error()).stack.split('\n')[2]?.trim());
+const stop = (why = '?') => { console.log('[STOP]', why, 'running(before)=', running);
 
       if (!running) return;
       running = false;
@@ -300,19 +301,26 @@
     };
 
     // ユーザー操作で即停止
-    window.addEventListener('wheel', stop, { passive:true });
-    
+   // window.addEventListener('wheel', stop, { passive:true });
+      window.addEventListener('wheel', () => stop('wheel'), { passive:true });
+
+    //window.addEventListener('wheel', () => stop('wheel'), { passive:true });
+
 window.addEventListener('touchstart', (e) => {
   if (e.target && e.target.closest && e.target.closest('#fab')) return;
-  stop();
+  //stop();
+　stop('touchstart');
 }, { passive:true });
 
     
-    window.addEventListener('keydown', stop);
-    
+    //window.addEventListener('keydown', stop);
+    window.addEventListener('keydown', () => stop('keydown'));
+
 window.addEventListener('mousedown', (e) => {
   if (e.target && e.target.closest && e.target.closest('#fab')) return; // walk操作は停止扱いにしない
-  stop();
+  //stop();
+    stop('mousedown');
+
 });
     const retarget = () => {
       const wiggle = 1 + rand(-WANDER, WANDER);
