@@ -321,6 +321,8 @@ window.addEventListener('mousedown', (e) => {
     setInterval(retarget, 1800);
 
     function step(t){
+            console.count('[STEP] frame');
+
       if (!running) return;
 
       const dt = (t - lastT) / 1000;
