@@ -27,7 +27,6 @@
       padding: 44px 18px 96px;
     }
 
-    /* H1相当（Markdownの # ） */
     h1{
       font-size: 16px;
       font-weight: 600;
@@ -61,7 +60,6 @@
       text-decoration-color: rgba(0,0,0,0.25);
     }
 
-    /* 「リンクに見せすぎない」トップのリンク */
     a.stealth{
       color: var(--text);
       text-decoration: none;
@@ -76,7 +74,7 @@
       position: fixed;
       right: 14px;
       bottom: 14px;
-      z-index: 9999;
+      z-index: 999999; /* かぶり対策で強め */
       display: inline-flex;
       gap: 10px;
       align-items: center;
@@ -106,13 +104,31 @@
     .fab .state{
       font-variant-numeric: tabular-nums;
     }
+
+    /* 右上：実験番号＆自己診断（EXP 2） */
+    .exp{
+      position: fixed;
+      top: 12px;
+      right: 12px;
+      z-index: 999999;
+      padding: 10px 12px;
+      border: 1px solid rgba(0,0,0,0.12);
+      border-radius: 12px;
+      background: rgba(255,255,255,0.92);
+      backdrop-filter: blur(6px);
+      font-size: 12px;
+      color: var(--muted);
+      line-height: 1.35;
+      user-select: none;
+      font-variant-numeric: tabular-nums;
+      min-width: 170px;
+    }
+    .exp b{ color: var(--text); font-weight: 600; }
   </style>
 </head>
 <body>
   <main>
-    <!-- # [年表（確認用）](record-2026-01-15.html) を再現 -->
     <h1><a class="stealth" href="record-2026-01-15.html">年表（確認用）</a></h1>
-
     <hr>
 
     <h2>前8世紀頃</h2>
@@ -134,44 +150,28 @@
     </ul>
 
     <h2>1687</h2>
-    <ul>
-      <li>プリンキピア　［制作中］</li>
-    </ul>
+    <ul><li>プリンキピア　［制作中］</li></ul>
 
     <h2>1781</h2>
-    <ul>
-      <li>純粋理性批判　［制作中］</li>
-    </ul>
+    <ul><li>純粋理性批判　［制作中］</li></ul>
 
     <h2>1790</h2>
-    <ul>
-      <li>判断力批判　［制作中］</li>
-    </ul>
+    <ul><li>判断力批判　［制作中］</li></ul>
 
     <h2>1807</h2>
-    <ul>
-      <li>精神現象学　［制作中］</li>
-    </ul>
+    <ul><li>精神現象学　［制作中］</li></ul>
 
     <h2>1812</h2>
-    <ul>
-      <li>論理学（第一巻）　［制作中］</li>
-    </ul>
+    <ul><li>論理学（第一巻）　［制作中］</li></ul>
 
     <h2>1844</h2>
-    <ul>
-      <li>経済学・哲学草稿　［制作中］</li>
-    </ul>
+    <ul><li>経済学・哲学草稿　［制作中］</li></ul>
 
     <h2>1859</h2>
-    <ul>
-      <li>種の起源　［制作中］</li>
-    </ul>
+    <ul><li>種の起源　［制作中］</li></ul>
 
     <h2>1886</h2>
-    <ul>
-      <li>善悪の彼岸　［制作中］</li>
-    </ul>
+    <ul><li>善悪の彼岸　［制作中］</li></ul>
 
     <h2>1900</h2>
     <ul>
@@ -180,14 +180,10 @@
     </ul>
 
     <h2>1927</h2>
-    <ul>
-      <li>存在と時間　［制作中］</li>
-    </ul>
+    <ul><li>存在と時間　［制作中］</li></ul>
 
     <h2>1929</h2>
-    <ul>
-      <li>過程と実在　［制作中］</li>
-    </ul>
+    <ul><li>過程と実在　［制作中］</li></ul>
 
     <h2>1936</h2>
     <ul>
@@ -202,9 +198,7 @@
     </ul>
 
     <h2>1958</h2>
-    <ul>
-      <li>物理学と哲学　［制作中］</li>
-    </ul>
+    <ul><li>物理学と哲学　［制作中］</li></ul>
 
     <h2>2025</h2>
     <ul>
@@ -222,51 +216,72 @@
     </ul>
   </main>
 
+  <!-- 右上：実験番号＆診断 -->
+  <div class="exp" id="exp">
+    <div><b>EXP 2</b></div>
+    <div>JS: <span id="jsok">…</span></div>
+    <div>click: <span id="clicks">0</span></div>
+    <div>state: <span id="runstate">off</span></div>
+    <div>y/max: <span id="pos">0</span>/<span id="max">0</span></div>
+  </div>
+
   <!-- 右下：walk トグル -->
   <div class="fab" id="fab">
-    <button id="toggle" aria-label="walk toggle">walk</button>
+    <button id="toggle" type="button" aria-label="walk toggle">walk</button>
     <span class="state" id="state">off</span>
   </div>
 
   <script>
   (() => {
-    // prefers-reduced-motion の人には動かさない
-    const reduceMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const jsok = document.getElementById('jsok');
+    const clicksEl = document.getElementById('clicks');
+    const runStateEl = document.getElementById('runstate');
+    const posEl = document.getElementById('pos');
+    const maxEl = document.getElementById('max');
+
+    jsok.textContent = 'OK';
+
     const toggleBtn = document.getElementById('toggle');
     const stateEl = document.getElementById('state');
 
-    if (reduceMotion) {
-      stateEl.textContent = 'off';
-      toggleBtn.style.opacity = '0.55';
-      toggleBtn.title = 'reduced motion';
-      return;
-    }
-
-    // ====== 調整パラメータ（ここだけ触ればOK） ======
-    const BASE_PX_PER_SEC = 12;      // 基本速度（ゆっくり）
-    const WANDER = 0.65;             // 歩調のゆらぎ（0〜1）
-    const PAUSE_CHANCE = 0.012;      // 立ち止まり頻度
-    const BACKSTEP_CHANCE = 0.004;   // 後戻り頻度
-    const MAX_BACKSTEP_PX = 90;      // 後戻り最大量
+    // ====== 調整パラメータ ======
+    const BASE_PX_PER_SEC = 12;
+    const WANDER = 0.65;
+    const PAUSE_CHANCE = 0.012;
+    const BACKSTEP_CHANCE = 0.004;
+    const MAX_BACKSTEP_PX = 90;
     const MIN_PAUSE_MS = 450;
     const MAX_PAUSE_MS = 2300;
-    const EDGE_PADDING_PX = 10;      // 下端停止の余白
-    // ================================================
+    const EDGE_PADDING_PX = 10;
+    // ============================
 
     let running = false;
     let pausedUntil = 0;
     let lastT = performance.now();
     let targetV = BASE_PX_PER_SEC;
     let v = BASE_PX_PER_SEC;
+    let clickCount = 0;
 
     const clamp = (x,a,b) => Math.max(a, Math.min(b,x));
     const rand = (a,b) => a + Math.random()*(b-a);
     const maxScrollTop = () => Math.max(0, document.documentElement.scrollHeight - window.innerHeight);
 
+    function updateDiag(){
+      const top = Math.round(window.scrollY);
+      const mx = Math.round(maxScrollTop());
+      posEl.textContent = String(top);
+      maxEl.textContent = String(mx);
+      runStateEl.textContent = running ? 'on' : 'off';
+    }
+    updateDiag();
+    window.addEventListener('scroll', updateDiag, { passive:true });
+    window.addEventListener('resize', updateDiag);
+
     const stop = () => {
       if (!running) return;
       running = false;
       stateEl.textContent = 'off';
+      updateDiag();
     };
 
     // ユーザーが触れたら停止
@@ -289,10 +304,10 @@
       lastT = t;
 
       const top = window.scrollY;
-      const maxTop = maxScrollTop();
+      const mx = maxScrollTop();
 
-      // ★重要：先頭(top=0)では停止しない。下端だけ静かに停止する。
-      if (top >= maxTop - EDGE_PADDING_PX) {
+      // 下端だけ静かに停止（先頭は止めない）
+      if (top >= mx - EDGE_PADDING_PX) {
         stop();
         return;
       }
@@ -310,28 +325,36 @@
 
       if (Math.random() < BACKSTEP_CHANCE) {
         const back = rand(20, MAX_BACKSTEP_PX);
-        window.scrollTo(0, clamp(top - back, 0, maxTop));
+        window.scrollTo(0, clamp(top - back, 0, mx));
         pausedUntil = t + rand(260, 900);
         requestAnimationFrame(step);
         return;
       }
 
-      // なめらか追従
       const follow = 0.06;
       v = v + (targetV - v) * follow;
 
-      window.scrollTo(0, clamp(top + v * dt, 0, maxTop));
+      window.scrollTo(0, clamp(top + v * dt, 0, mx));
       requestAnimationFrame(step);
     }
 
-    toggleBtn.addEventListener('click', () => {
+    function toggle(){
+      clickCount += 1;
+      clicksEl.textContent = String(clickCount);
+
       running = !running;
       stateEl.textContent = running ? 'on' : 'off';
+      updateDiag();
+
       if (running) {
         lastT = performance.now();
         requestAnimationFrame(step);
       }
-    });
+    }
+
+    // クリックが確実に拾えるように二重で仕掛ける
+    toggleBtn.addEventListener('click', toggle);
+    toggleBtn.onclick = toggle;
   })();
   </script>
 </body>
