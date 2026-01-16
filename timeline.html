@@ -3,325 +3,237 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>年表（確認用）</title>
+  <title>timeline</title>
   <style>
     :root{
-      --text:#111;
-      --muted:rgba(0,0,0,.55);
-      --rule:rgba(0,0,0,.10);
+      --bg:#fff;
+      --text: rgba(0,0,0,0.90);
+      --muted: rgba(0,0,0,0.58);
+      --rule: rgba(0,0,0,0.10);
     }
-    html,body{ margin:0; background:#fff; color:var(--text); }
+    html,body{ margin:0; background:var(--bg); color:var(--text); }
     body{
       font-family: system-ui, -apple-system, "Segoe UI",
-               "Hiragino Kaku Gothic ProN", "Yu Gothic", "Meiryo",
-               "Noto Sans JP", sans-serif;
+                   "Hiragino Kaku Gothic ProN", "Yu Gothic", "Meiryo",
+                   "Noto Sans JP", sans-serif;
+      letter-spacing: 0.01em;
     }
-    main{ max-width:900px; margin:0 auto; padding:64px 24px 96px; }
-    h1{ font-size:28px; margin:0 0 18px; font-weight:600; }
-    hr{ border:none; border-top:1px solid var(--rule); margin:22px 0 28px; }
-
-    h2{ font-size:18px; margin:34px 0 10px; font-weight:600; }
-    ul{ margin:0; padding-left:1.2em; }
-    li{ margin:4px 0; }
-
-    /* リンクに見えないリンク */
-    a.stealth{
-      color:var(--text);
-      text-decoration:none;
+    main{
+      max-width: 760px;
+      margin-left: auto;
+      margin-right: auto;
+      padding: 44px 18px 96px;
     }
+    h1{
+      font-size: 16px;
+      font-weight: 600;
+      margin: 0 0 14px;
+      letter-spacing: 0.02em;
+    }
+    hr{
+      border:none;
+      border-top:1px solid var(--rule);
+      margin: 16px 0 18px;
+    }
+    h2{
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--muted);
+      margin: 22px 0 10px;
+    }
+    ul{ margin: 0 0 0 1.15em; padding:0; }
+    li{ margin: 6px 0; }
 
-    /* 下線は出さない（リンクの匂いを消す） */
-a.stealth-title:hover,
-a.stealth:hover{
-  text-decoration: none;
-}
-
-/* 触れたことの“反応”は、濃度の微変化だけ */
-a.stealth-title{
-  display: inline-block;           /* 揺れのため */
-  transition: opacity 200ms ease;  /* 濃度変化 */
-}
-a.stealth-title.is-hover{
-  opacity: 0.88;                   /* ほんの少しだけ変える */
-}
-
-/* ごく小さな揺れ（1回） */
-@keyframes microWiggle {
-  0%   { transform: translateX(0); }
-  30%  { transform: translateX(0.6px); }
-  60%  { transform: translateX(-0.4px); }
-  100% { transform: translateX(0); }
-}
-a.stealth-title.wiggle{
-  animation: microWiggle 240ms ease-out 1;
-}
-
-
-
-
-    
-    /* 触れたときだけ、わずかに反応する */
-   /* a.stealth:hover{
-      color:rgba(0,0,0,.85);
-      text-decoration:underline;
-      text-decoration-color:rgba(0,0,0,.18);
-      text-underline-offset: 0.2em;
+    a{
+      color: var(--text);
+      text-decoration: none;
+    }
+    a:hover{
+      text-decoration: underline;
+      text-decoration-color: rgba(0,0,0,0.25);
     }
 
-    /* 見出し（年表）もリンクだが、より静かに */
-    a.stealth-title{
-      color:var(--text);
-      text-decoration:none;
+    /* 右下：walk トグル（静か） */
+    .fab{
+      position: fixed;
+      right: 14px;
+      bottom: 14px;
+      z-index: 9999;
+      display: inline-flex;
+      gap: 10px;
+      align-items: center;
+      padding: 10px 12px;
+      border: 1px solid rgba(0,0,0,0.12);
+      border-radius: 999px;
+      background: rgba(255,255,255,0.92);
+      backdrop-filter: blur(6px);
+      font-size: 12.5px;
+      color: var(--muted);
+      user-select: none;
     }
-    
-    a.stealth-title:hover{
-      text-decoration:underline;
-      text-decoration-color:rgba(0,0,0,.12);
-      text-underline-offset: 0.22em;
+    .fab button{
+      border: none;
+      background: transparent;
+      padding: 0;
+      margin: 0;
+      font: inherit;
+      color: var(--text);
+      cursor: pointer;
+      letter-spacing: 0.02em;
     }
-
-    /* 小さな状態表示 */
-    .hint{
-      font-size:13px;
-      color:var(--muted);
-      margin: 10px 0 0;
+    .fab button:hover{
+      text-decoration: underline;
+      text-decoration-color: rgba(0,0,0,0.25);
+    }
+    .fab .state{
+      font-variant-numeric: tabular-nums;
     }
   </style>
 </head>
 <body>
   <main>
-    <!-- 「年表（確認用）」にカーソルを置いて滞留すると、対話へ落ちる -->
-    <h1>
-      <a class="stealth-title" id="to-record" href="record-2026-01-15.html">年表（確認用）</a>
-    </h1>
-    <div class="hint">（ここにカーソルを置いて少し滞留すると、記録へ移動します）</div>
+    <h1>timeline</h1>
 
-    <hr />
+    <div><a href="record-2026-01-15.html">record 2026-01-15</a></div>
 
+    <hr>
+
+    <!-- ここは timeline.md を HTML に写していく領域（必要なら今後自動化も可） -->
     <h2>前8世紀頃</h2>
     <ul>
-      <li><span class="stealth">イリアス　［制作中］</span></li>
-      <li><span class="stealth">オデュッセイア　［制作中］</span></li>
+      <li>イリアス　［制作中］</li>
+      <li>オデュッセイア　［制作中］</li>
     </ul>
 
     <h2>前7世紀</h2>
     <ul>
-      <li><span class="stealth">神統記　［制作中］</span></li>
+      <li>神統記　［制作中］</li>
     </ul>
 
     <h2>前4世紀</h2>
     <ul>
-      <li><span class="stealth">ティマイオス　［制作中］</span></li>
-      <li><span class="stealth">形而上学　［制作中］</span></li>
-      <li><span class="stealth">国家　［制作中］</span></li>
-    </ul>
-
-    <h2>1687</h2>
-    <ul><li><span class="stealth">プリンキピア　［制作中］</span></li></ul>
-
-    <h2>1781</h2>
-    <ul><li><span class="stealth">純粋理性批判　［制作中］</span></li></ul>
-
-    <h2>1790</h2>
-    <ul><li><span class="stealth">判断力批判　［制作中］</span></li></ul>
-
-    <h2>1807</h2>
-    <ul><li><span class="stealth">精神現象学　［制作中］</span></li></ul>
-
-    <h2>1812</h2>
-    <ul><li><span class="stealth">論理学（第一巻）　［制作中］</span></li></ul>
-
-    <h2>1844</h2>
-    <ul><li><span class="stealth">経済学・哲学草稿　［制作中］</span></li></ul>
-
-    <h2>1859</h2>
-    <ul><li><span class="stealth">種の起源　［制作中］</span></li></ul>
-
-    <h2>1886</h2>
-    <ul><li><span class="stealth">善悪の彼岸　［制作中］</span></li></ul>
-
-    <h2>1900</h2>
-    <ul>
-      <li><span class="stealth">論理哲学論考（草）　［制作中］</span></li>
-      <li><span class="stealth">数学原理（抄）　［制作中］</span></li>
-    </ul>
-
-    <h2>1927</h2>
-    <ul><li><span class="stealth">存在と時間　［制作中］</span></li></ul>
-
-    <h2>1929</h2>
-    <ul><li><span class="stealth">過程と実在　［制作中］</span></li></ul>
-
-    <h2>1936</h2>
-    <ul>
-      <li><span class="stealth">芸術作品の複製技術時代　［制作中］</span></li>
-      <li><span class="stealth">科学革命の構造（草）　［制作中］</span></li>
-    </ul>
-
-    <h2>1953</h2>
-    <ul>
-      <li><span class="stealth">哲学探究　［制作中］</span></li>
-      <li><span class="stealth">方法序説（再読）　［制作中］</span></li>
-    </ul>
-
-    <h2>1958</h2>
-    <ul><li><span class="stealth">物理学と哲学　［制作中］</span></li></ul>
-
-    <h2>2025</h2>
-    <ul>
-      <li><span class="stealth">原典翻訳プロジェクト（断片）　［制作中］</span></li>
-      <li><span class="stealth">科学と哲学のあいだ（草）　［制作中］</span></li>
+      <li>ティマイオス　［制作中］</li>
+      <li>形而上学　［制作中］</li>
+      <li>国家　［制作中］</li>
     </ul>
 
     <h2>2026</h2>
     <ul>
-      <li><span class="stealth">物とは何か（原稿）　［制作中］</span></li>
-      <li><span class="stealth">哲学者たちは、物をどう捉えてきたのか（原稿）　［制作中］</span></li>
-      <li><span class="stealth">本_倫理（構想）　［制作中］</span></li>
-      <!-- ここは「記録」へ飛ぶ対象にしてもよい：今は表示だけ -->
-      <li><span class="stealth">対話記録：AIと哲学（断片）　［制作中］</span></li>
-      <li><span class="stealth">散歩の記録（断片）　［制作中］</span></li>
+      <li>対話記録：AIと哲学（断片）　［制作中］</li>
     </ul>
-
-    <hr />
-    <div class="hint"><a class="stealth" href="./">（戻る）</a></div>
   </main>
 
+  <!-- 右下：walk トグル -->
+  <div class="fab" id="fab">
+    <button id="toggle">walk</button>
+    <span class="state" id="state">off</span>
+  </div>
+
   <script>
-    // 「年表（確認用）」にカーソルを置いて一定時間滞留したら遷移
-    const target = document.getElementById("to-record");
-    const href = target.getAttribute("href");
+  (() => {
+    // prefers-reduced-motion の人には動かさない
+    const reduceMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const toggleBtn = document.getElementById('toggle');
+    const stateEl = document.getElementById('state');
 
-    let timer = null;
-    const delayMs = 1200; // 滞留時間：思想に合わせて後で調整
-
-    function start(){
-      function start(){
-  cancel();
-
-  // 触れた反応：微かな濃度変化 + 揺れ（1回）
-  target.classList.add("is-hover");
-  target.classList.remove("wiggle"); // 連続発火対策
-  // reflowでアニメを確実に再スタート
-  void target.offsetWidth;
-  target.classList.add("wiggle");
-
-  timer = setTimeout(() => { window.location.href = href; }, delayMs);
-}
-
-      /*clearTimeout(timer);
-      timer = setTimeout(() => { window.location.href = href; }, delayMs);
-     */
+    if (reduceMotion) {
+      stateEl.textContent = 'off';
+      toggleBtn.style.opacity = '0.55';
+      toggleBtn.title = 'reduced motion';
+      return;
     }
 
-function cancel(){
-  clearTimeout(timer);
-  timer = null;
-  target.classList.remove("is-hover");
-}
+    // ====== 調整パラメータ（ここだけ触ればOK） ======
+    const BASE_PX_PER_SEC = 12;      // もっと遅く→ 10 / 8
+    const WANDER = 0.65;             // 歩調のゆらぎ
+    const PAUSE_CHANCE = 0.012;      // 立ち止まり頻度
+    const BACKSTEP_CHANCE = 0.004;   // 後戻り頻度
+    const MAX_BACKSTEP_PX = 90;      // 後戻り最大量
+    const MIN_PAUSE_MS = 450;
+    const MAX_PAUSE_MS = 2300;
+    const EDGE_PADDING_PX = 10;
+    // ================================================
 
-    
-    target.addEventListener("mouseenter", start);
-    target.addEventListener("mouseleave", cancel);
-    target.addEventListener("focus", start);
-    target.addEventListener("blur", cancel);
+    let running = false;
+    let pausedUntil = 0;
+    let lastT = performance.now();
+    let targetV = BASE_PX_PER_SEC;
+    let v = BASE_PX_PER_SEC;
+
+    const clamp = (x,a,b) => Math.max(a, Math.min(b,x));
+    const rand = (a,b) => a + Math.random()*(b-a);
+    const maxScrollTop = () => Math.max(0, document.documentElement.scrollHeight - window.innerHeight);
+
+    const stop = () => {
+      if (!running) return;
+      running = false;
+      stateEl.textContent = 'off';
+    };
+
+    // ユーザーが触れたら停止（思想的に必須）
+    window.addEventListener('wheel', stop, { passive:true });
+    window.addEventListener('touchstart', stop, { passive:true });
+    window.addEventListener('keydown', stop);
+    window.addEventListener('mousedown', stop);
+
+    const retarget = () => {
+      const wiggle = 1 + rand(-WANDER, WANDER);
+      targetV = BASE_PX_PER_SEC * wiggle;
+    };
+    retarget();
+    setInterval(retarget, 1800);
+
+    function step(t){
+      if (!running) return;
+
+      const dt = (t - lastT) / 1000;
+      lastT = t;
+
+      const top = window.scrollY;
+      const maxTop = maxScrollTop();
+
+      // 端なら静かに停止（無限ループにしない）
+      if (top <= EDGE_PADDING_PX || top >= maxTop - EDGE_PADDING_PX) {
+        stop();
+        return;
+      }
+
+      if (t < pausedUntil) {
+        requestAnimationFrame(step);
+        return;
+      }
+
+      if (Math.random() < PAUSE_CHANCE) {
+        pausedUntil = t + rand(MIN_PAUSE_MS, MAX_PAUSE_MS);
+        requestAnimationFrame(step);
+        return;
+      }
+
+      if (Math.random() < BACKSTEP_CHANCE) {
+        const back = rand(20, MAX_BACKSTEP_PX);
+        window.scrollTo(0, clamp(top - back, 0, maxTop));
+        pausedUntil = t + rand(260, 900);
+        requestAnimationFrame(step);
+        return;
+      }
+
+      // なめらか追従
+      const follow = 0.06;
+      v = v + (targetV - v) * follow;
+
+      window.scrollTo(0, clamp(top + v * dt, 0, maxTop));
+      requestAnimationFrame(step);
+    }
+
+    toggleBtn.addEventListener('click', () => {
+      running = !running;
+      stateEl.textContent = running ? 'on' : 'off';
+      if (running) {
+        lastT = performance.now();
+        requestAnimationFrame(step);
+      }
+    });
+  })();
   </script>
 </body>
-<script>
-(() => {
-  // ====== 調整パラメータ（ここだけ触ればOK） ======
-  const BASE_PX_PER_SEC = 14;     // 基本速度（ゆっくり）
-  const WANDER = 0.55;            // 速度ゆらぎ（0〜1）
-  const PAUSE_CHANCE = 0.010;     // 立ち止まり頻度（小さいほど少ない）
-  const BACKSTEP_CHANCE = 0.004;  // 後戻り頻度
-  const MAX_BACKSTEP_PX = 120;    // 後戻り最大量
-  const MIN_PAUSE_MS = 400;       // 最短停止
-  const MAX_PAUSE_MS = 2200;      // 最長停止
-  const EDGE_PADDING_PX = 10;     // 上下端で止める余白
-  // ================================================
-
-  // reduced motion の人には自動を出さない
-  const reduceMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  if (reduceMotion) return;
-
-  let running = true;
-  let pausedUntil = 0;
-  let lastT = performance.now();
-  let targetV = BASE_PX_PER_SEC;  // 目標速度（ゆらぐ）
-  let v = BASE_PX_PER_SEC;        // 実速度（なめらかに追従）
-
-  const clamp = (x, a, b) => Math.max(a, Math.min(b, x));
-  const rand = (a, b) => a + Math.random() * (b - a);
-  const now = () => performance.now();
-
-  // ユーザーが触れたら停止（思想的にも必須）
-  const stop = () => { running = false; };
-  window.addEventListener('wheel', stop, { passive:true });
-  window.addEventListener('touchstart', stop, { passive:true });
-  window.addEventListener('keydown', stop);
-  window.addEventListener('mousedown', stop);
-
-  // 速度目標をときどき更新（歩調が変わる）
-  const retarget = () => {
-    const wiggle = 1 + rand(-WANDER, WANDER);
-    targetV = BASE_PX_PER_SEC * wiggle;
-  };
-  retarget();
-  setInterval(retarget, 1800); // 歩調更新間隔
-
-  const maxScrollTop = () => Math.max(0, document.documentElement.scrollHeight - window.innerHeight);
-
-  function step(t){
-    if (!running) return;
-
-    const dt = (t - lastT) / 1000;
-    lastT = t;
-
-    // 端なら止める（無限ループにしない思想）
-    const top = window.scrollY;
-    const maxTop = maxScrollTop();
-    if (top <= EDGE_PADDING_PX || top >= maxTop - EDGE_PADDING_PX) {
-      // 端では静かに停止
-      return;
-    }
-
-    // 停止中
-    if (t < pausedUntil) {
-      requestAnimationFrame(step);
-      return;
-    }
-
-    // 立ち止まり（ときどき）
-    if (Math.random() < PAUSE_CHANCE) {
-      pausedUntil = t + rand(MIN_PAUSE_MS, MAX_PAUSE_MS);
-      requestAnimationFrame(step);
-      return;
-    }
-
-    // 後戻り（ときどき）
-    if (Math.random() < BACKSTEP_CHANCE) {
-      const back = rand(20, MAX_BACKSTEP_PX);
-      const newTop = clamp(top - back, 0, maxTop);
-      window.scrollTo(0, newTop);
-      // 少し止まると「振り返り」感が出る
-      pausedUntil = t + rand(250, 900);
-      requestAnimationFrame(step);
-      return;
-    }
-
-    // 速度をなめらかに追従（急変させない）
-    const follow = 0.06; // 小さいほど“なめらか”
-    v = v + (targetV - v) * follow;
-
-    // スクロール
-    const nextTop = clamp(top + v * dt, 0, maxTop);
-    window.scrollTo(0, nextTop);
-
-    requestAnimationFrame(step);
-  }
-
-  requestAnimationFrame(step);
-})();
-</script>
-  
 </html>
