@@ -291,7 +291,7 @@
     window.addEventListener('resize', updateDiag);
 
     const stop = () => {
-            console.log('[STOP] fired by', (new Error()).stack.split('\n')[2]?.trim());
+            //console.log('[STOP] fired by', (new Error()).stack.split('\n')[2]?.trim());
 
       if (!running) return;
       running = false;
@@ -322,7 +322,7 @@ window.addEventListener('mousedown', (e) => {
     setInterval(retarget, 1800);
 
     function step(t){
-            console.count('[STEP] frame');
+            //console.count('[STEP] frame');
 
       if (!running) return;
 
@@ -372,9 +372,9 @@ window.addEventListener('mousedown', (e) => {
     }
 
     function toggle(){
-            console.count('[toggle] called');
+            //console.count('[toggle] called');
 
-      console.log('TOGGLE', Date.now(), 'running(before)=', running);
+      //console.log('TOGGLE', Date.now(), 'running(before)=', running);
       clickCount += 1;
       clicksEl.textContent = String(clickCount);
 
