@@ -20,442 +20,150 @@
       letter-spacing: 0.01em;
       line-height: 1.55;
     }
-
     main{
       max-width: 760px;
       margin-left: auto;
       margin-right: auto;
       padding: 44px 18px 96px;
     }
+    h1{ font-size:16px; font-weight:600; margin:0 0 14px; }
+    hr{ border:none; border-top:1px solid var(--rule); margin:16px 0 18px; }
+    h2{ font-size:13px; font-weight:600; color:var(--muted); margin:22px 0 10px; }
+    ul{ margin:0 0 0 1.15em; padding:0; }
+    li{ margin:6px 0; }
 
-    h1{
-      font-size: 16px;
-      font-weight: 600;
-      margin: 0 0 14px;
-      letter-spacing: 0.02em;
-    }
-
-    hr{
-      border:none;
-      border-top:1px solid var(--rule);
-      margin: 16px 0 18px;
-    }
-
-    h2{
-      font-size: 13px;
-      font-weight: 600;
-      color: var(--muted);
-      margin: 22px 0 10px;
-      letter-spacing: 0.02em;
-    }
-
-    ul{ margin: 0 0 0 1.15em; padding:0; }
-    li{ margin: 6px 0; }
-
-    a{ color: var(--text); text-decoration: none; }
-    a:hover{
-      text-decoration: underline;
-      text-decoration-color: rgba(0,0,0,0.25);
-    }
-    a.stealth{ color: var(--text); text-decoration: none; }
-    a.stealth:hover{
-      text-decoration: underline;
-      text-decoration-color: rgba(0,0,0,0.22);
-    }
-
-    /* 実験用：確実にスクロール余地を作る（動作確認後に消してOK） */
     .scroll-dummy{ height: 1400px; }
 
-    /* 右下：walk トグル */
     .fab{
-      position: fixed;
-      right: 14px;
-      bottom: 14px;
-      z-index: 999999;
-      display: inline-flex;
-      gap: 10px;
-      align-items: center;
-      padding: 10px 12px;
-      border: 1px solid rgba(0,0,0,0.12);
-      border-radius: 999px;
-      background: rgba(255,255,255,0.92);
-      backdrop-filter: blur(6px);
-      font-size: 12.5px;
-      color: var(--muted);
-      user-select: none;
+      position:fixed; right:14px; bottom:14px; z-index:9999;
+      display:flex; gap:10px; align-items:center;
+      padding:10px 12px;
+      border:1px solid rgba(0,0,0,0.12);
+      border-radius:999px;
+      background:rgba(255,255,255,0.92);
+      font-size:12.5px;
     }
-    .fab button{
-      border: none;
-      background: transparent;
-      padding: 0;
-      margin: 0;
-      font: inherit;
-      color: var(--text);
-      cursor: pointer;
-      letter-spacing: 0.02em;
-    }
-    .fab button:hover{
-      text-decoration: underline;
-      text-decoration-color: rgba(0,0,0,0.25);
-    }
-    .fab .state{
-      font-variant-numeric: tabular-nums;
-    }
+    .fab button{ border:none; background:none; cursor:pointer; }
+    .fab .state{ font-variant-numeric: tabular-nums; }
 
-    /* 右上：実験番号＆診断 */
     .exp{
-      position: fixed;
-      top: 12px;
-      right: 12px;
-      z-index: 999999;
-      padding: 10px 12px;
-      border: 1px solid rgba(0,0,0,0.12);
-      border-radius: 12px;
-      background: rgba(255,255,255,0.92);
-      backdrop-filter: blur(6px);
-      font-size: 12px;
-      color: var(--muted);
-      line-height: 1.35;
-      user-select: none;
-      font-variant-numeric: tabular-nums;
-      min-width: 190px;
+      position:fixed; top:12px; right:12px; z-index:9999;
+      padding:10px 12px;
+      border:1px solid rgba(0,0,0,0.12);
+      border-radius:12px;
+      background:rgba(255,255,255,0.92);
+      font-size:12px;
+      min-width:190px;
     }
-    .exp b{ color: var(--text); font-weight: 600; }
   </style>
 </head>
 
 <body>
-  <main>
-    <!-- timeline.md の先頭 # [年表（確認用）](record-2026-01-15.html) を再現 -->
-    <h1><a class="stealth" href="record-2026-01-15.html">年表（確認用）</a></h1>
-    <hr>
+<main>
+  <h1>年表（確認用）</h1>
+  <hr>
 
-    <h2>前8世紀頃</h2>
-    <ul>
-      <li>イリアス　［制作中］</li>
-      <li>オデュッセイア　［制作中］</li>
-    </ul>
+  <!-- （内容はそのまま） -->
+  <h2>前8世紀頃</h2>
+  <ul><li>イリアス</li><li>オデュッセイア</li></ul>
+  <h2>前7世紀</h2><ul><li>神統記</li></ul>
+  <h2>前4世紀</h2><ul><li>ティマイオス</li><li>形而上学</li><li>国家</li></ul>
+  <h2>1687</h2><ul><li>プリンキピア</li></ul>
+  <h2>1781</h2><ul><li>純粋理性批判</li></ul>
+  <h2>1790</h2><ul><li>判断力批判</li></ul>
+  <h2>1807</h2><ul><li>精神現象学</li></ul>
+  <h2>1812</h2><ul><li>論理学</li></ul>
+  <h2>1844</h2><ul><li>経済学・哲学草稿</li></ul>
+  <h2>1859</h2><ul><li>種の起源</li></ul>
+  <h2>1886</h2><ul><li>善悪の彼岸</li></ul>
+  <h2>1900</h2><ul><li>論理哲学論考</li></ul>
+  <h2>1927</h2><ul><li>存在と時間</li></ul>
+  <h2>1929</h2><ul><li>過程と実在</li></ul>
+  <h2>1936</h2><ul><li>芸術作品の複製技術時代</li></ul>
+  <h2>1953</h2><ul><li>哲学探究</li></ul>
+  <h2>1958</h2><ul><li>物理学と哲学</li></ul>
+  <h2>2025</h2><ul><li>原典翻訳プロジェクト</li></ul>
+  <h2 id="last">2026</h2>
+  <ul>
+    <li>物とは何か</li>
+    <li>哲学者たちは、物をどう捉えてきたのか</li>
+    <li>本_倫理</li>
+  </ul>
+</main>
 
-    <h2>前7世紀</h2>
-    <ul><li>神統記　［制作中］</li></ul>
+<div class="scroll-dummy"></div>
 
-    <h2>前4世紀</h2>
-    <ul>
-      <li>ティマイオス　［制作中］</li>
-      <li>形而上学　［制作中］</li>
-      <li>国家　［制作中］</li>
-    </ul>
+<div class="exp">
+  <div>cycle: <span id="cycle">down</span></div>
+  <div>state: <span id="runstate">off</span></div>
+</div>
 
-    <h2>1687</h2>
-    <ul><li>プリンキピア　［制作中］</li></ul>
+<div class="fab">
+  <button id="toggle">walk</button>
+  <span class="state" id="state">off</span>
+</div>
 
-    <h2>1781</h2>
-    <ul><li>純粋理性批判　［制作中］</li></ul>
+<script>
+const toggleBtn = document.getElementById('toggle');
+const stateEl = document.getElementById('state');
+const runStateEl = document.getElementById('runstate');
+const cycleEl = document.getElementById('cycle');
+const lastMarker = document.getElementById('last');
 
-    <h2>1790</h2>
-    <ul><li>判断力批判　［制作中］</li></ul>
+const BASE = 1.2;          // 下へゆっくり
+const REWIND_MULT = 3;     // ★ 巻き戻し 3倍速
+const EDGE = 20;
 
-    <h2>1807</h2>
-    <ul><li>精神現象学　［制作中］</li></ul>
+let running=false;
+let mode='down';
+let v=BASE;
+let targetV=BASE;
+let lastT=performance.now();
+let y=0;
 
-    <h2>1812</h2>
-    <ul><li>論理学（第一巻）　［制作中］</li></ul>
+function maxScroll(){
+  return document.documentElement.scrollHeight - innerHeight;
+}
 
-    <h2>1844</h2>
-    <ul><li>経済学・哲学草稿　［制作中］</li></ul>
+// ★ 最後の本が「下に見える」位置
+function lastVisibleY(){
+  const r = lastMarker.getBoundingClientRect();
+  const absY = window.scrollY + r.top;
+  return Math.min(absY - innerHeight * 0.6, maxScroll());
+}
 
-    <h2>1859</h2>
-    <ul><li>種の起源　［制作中］</li></ul>
+function step(t){
+  if(!running) return;
+  const dt=(t-lastT)/1000; lastT=t;
 
-    <h2>1886</h2>
-    <ul><li>善悪の彼岸　［制作中］</li></ul>
+  if(mode==='down' && y>=lastVisibleY()){
+    mode='rewind';
+    targetV = -BASE * REWIND_MULT;
+    cycleEl.textContent='rewind';
+  }
+  if(mode==='rewind' && y<=EDGE){
+    y=0;
+    mode='down';
+    targetV = BASE;
+    cycleEl.textContent='down';
+  }
 
-    <h2>1900</h2>
-    <ul>
-      <li>論理哲学論考（草）　［制作中］</li>
-      <li>数学原理（抄）　［制作中］</li>
-    </ul>
+  v += (targetV - v) * 0.06;
+  y = Math.max(0, Math.min(maxScroll(), y + v*dt));
+  scrollTo(0, Math.round(y));
+  requestAnimationFrame(step);
+}
 
-    <h2>1927</h2>
-    <ul><li>存在と時間　［制作中］</li></ul>
-
-    <h2>1929</h2>
-    <ul><li>過程と実在　［制作中］</li></ul>
-
-    <h2>1936</h2>
-    <ul>
-      <li>芸術作品の複製技術時代　［制作中］</li>
-      <li>科学革命の構造（草）　［制作中］</li>
-    </ul>
-
-    <h2>1953</h2>
-    <ul>
-      <li>哲学探究　［制作中］</li>
-      <li>方法序説（再読）　［制作中］</li>
-    </ul>
-
-    <h2>1958</h2>
-    <ul><li>物理学と哲学　［制作中］</li></ul>
-
-    <h2>2025</h2>
-    <ul>
-      <li>原典翻訳プロジェクト（断片）　［制作中］</li>
-      <li>科学と哲学のあいだ（草）　［制作中］</li>
-    </ul>
-
-    <h2>2026</h2>
-    <ul>
-      <li>物とは何か（原稿）　［制作中］</li>
-      <li>哲学者たちは、物をどう捉えてきたのか（原稿）　［制作中］</li>
-      <li>本_倫理（構想）　［制作中］</li>
-      <li>対話記録：AIと哲学（断片）　［制作中］</li>
-      <li>散歩の記録（断片）　［制作中］</li>
-    </ul>
-  </main>
-
-  <!-- 実験用：スクロール余地 -->
-  <div class="scroll-dummy" aria-hidden="true"></div>
-
-  <!-- 右上：診断 -->
-  <div class="exp" id="exp">
-    <div><b>EXP 4</b></div>
-    <div>JS: <span id="jsok">…</span></div>
-    <div>cycle: <span id="cycle">down</span></div>
-    <div>click: <span id="clicks">0</span></div>
-    <div>state: <span id="runstate">off</span></div>
-    <div>y/max: <span id="pos">0</span>/<span id="max">0</span></div>
-  </div>
-
-  <!-- 右下：walk -->
-  <div class="fab" id="fab">
-    <button id="toggle" type="button">walk</button>
-    <span class="state" id="state">off</span>
-  </div>
-
-  <script>
-    // ===== 診断UI =====
-    const jsok = document.getElementById('jsok');
-    const clicksEl = document.getElementById('clicks');
-    const runStateEl = document.getElementById('runstate');
-    const posEl = document.getElementById('pos');
-    const maxEl = document.getElementById('max');
-    const cycleEl = document.getElementById('cycle');
-    jsok.textContent = 'OK';
-
-    // ===== walk UI =====
-    const toggleBtn = document.getElementById('toggle');
-    const stateEl = document.getElementById('state');
-
-    // ====== 動作仕様 ======
-    // (1) 通常はゆっくり下へ（時々だけ「少し戻る」）
-    // (2) 下端に到達したら、上へ「10倍速」で巻き戻す
-    // (3) 上端に到達したら、また (1) を繰り返す
-    // 呼吸は無し
-    // =====================
-
-    // ====== 調整パラメータ ======
-    const BASE_PX_PER_SEC = 1.2;       // 下へ進む基本速度（ゆっくり）
-    const WANDER = 0.65;               // 下へ進むゆらぎ（前進時のみ）
-    const PAUSE_CHANCE = 0.012;        // 立ち止まり頻度（前進時のみ）
-    const BACKSTEP_CHANCE = 0.004;     // 小さな後戻り頻度（前進時のみ）
-    const MAX_BACKSTEP_PX = 90;        // 小さな後戻り量
-    const MIN_PAUSE_MS = 450;
-    const MAX_PAUSE_MS = 2300;
-
-    const EDGE_PADDING_PX = 10;
-    const REWIND_SPEED_MULT = 10.0;    // ★下端→上端の巻き戻し速度倍率（10倍）
-    const REWIND_EASE = 0.08;          // 巻き戻しのなめらかさ（大きいほど追従が速い）
-
-    // クリック直後に stop が誤発火しない猶予
-    const IGNORE_STOP_MS = 350;
-    // ================================================
-
-    const clamp = (x,a,b) => Math.max(a, Math.min(b,x));
-    const rand  = (a,b) => a + Math.random()*(b-a);
-
-    const maxScrollTop = () => {
-      const doc = document.documentElement;
-      const h = Math.max(
-        doc.scrollHeight,
-        document.body ? document.body.scrollHeight : 0
-      );
-      return Math.max(0, h - window.innerHeight);
-    };
-
-    let running = false;
-    let lastT = performance.now();
-
-    // 速度制御（符号あり）
-    let targetV = BASE_PX_PER_SEC; // +:下へ / -:上へ
-    let v = BASE_PX_PER_SEC;
-
-    let pausedUntil = 0;
-    let clickCount = 0;
-
-    // ★遅い速度でも確実に進むために小数を蓄積
-    let virtualY = 0;
-
-    // モード: 'down'（ゆっくり下） / 'rewind'（上へ巻き戻し）
-    let mode = 'down';
-
-    // stop 抑止
-    let ignoreStopUntil = 0;
-
-    function updateDiag(){
-      stateEl.textContent = running ? 'on' : 'off';
-      runStateEl.textContent = running ? 'on' : 'off';
-      posEl.textContent = String(Math.round(window.scrollY));
-      maxEl.textContent = String(Math.round(maxScrollTop()));
-      cycleEl.textContent = mode;
-    }
-    updateDiag();
-    window.addEventListener('scroll', updateDiag, { passive:true });
-    window.addEventListener('resize', updateDiag);
-
-    function stop(){
-      if (performance.now() < ignoreStopUntil) return;
-      if (!running) return;
-      running = false;
-      updateDiag();
-    }
-
-    // ユーザー操作で即停止（walk 操作自体は止めない）
-    window.addEventListener('wheel', stop, { passive:true });
-    window.addEventListener('keydown', stop);
-    window.addEventListener('touchstart', (e) => {
-      if (e.target && e.target.closest && e.target.closest('#fab')) return;
-      stop();
-    }, { passive:true });
-    window.addEventListener('mousedown', (e) => {
-      if (e.target && e.target.closest && e.target.closest('#fab')) return;
-      stop();
-    });
-
-    function retargetForward(){
-      const wiggle = 1 + rand(-WANDER, WANDER);
-      targetV = BASE_PX_PER_SEC * wiggle; // 前進（+）
-    }
-    retargetForward();
-
-    // 前進モードのゆらぎ更新（巻き戻し中は更新しない）
-    setInterval(() => {
-      if (!running) return;
-      if (mode !== 'down') return;
-      retargetForward();
-    }, 1800);
-
-    function enterDown(){
-      mode = 'down';
-      pausedUntil = 0;
-      v = Math.max(0, v); // 下向きへ寄せる
-      retargetForward();
-      updateDiag();
-    }
-
-    function enterRewind(){
-      mode = 'rewind';
-      pausedUntil = 0;
-      // 巻き戻しは - 方向へ
-      targetV = -BASE_PX_PER_SEC * REWIND_SPEED_MULT;
-      updateDiag();
-    }
-
-    function step(t){
-      if (!running) return;
-
-      const dt = (t - lastT) / 1000;
-      lastT = t;
-
-      const mx = maxScrollTop();
-      if (mx <= 0) { stop(); return; }
-
-      // モード遷移（下端→巻き戻し / 上端→前進）
-      if (mode === 'down') {
-        if (virtualY >= mx - EDGE_PADDING_PX) {
-          enterRewind();
-        }
-      } else { // rewind
-        if (virtualY <= 0 + EDGE_PADDING_PX) {
-          virtualY = 0;
-          window.scrollTo(0, 0);
-          enterDown();
-        }
-      }
-
-      // 立ち止まり（前進モードのみ）
-      if (mode === 'down') {
-        if (t < pausedUntil) {
-          requestAnimationFrame(step);
-          return;
-        }
-        if (Math.random() < PAUSE_CHANCE) {
-          pausedUntil = t + rand(MIN_PAUSE_MS, MAX_PAUSE_MS);
-          requestAnimationFrame(step);
-          return;
-        }
-
-        // 小さな後戻り（前進モードのみ・なめらかに）
-        if (Math.random() < BACKSTEP_CHANCE) {
-          // 一瞬だけ targetV をマイナス方向に倒して、自然に戻す
-          const back = rand(20, MAX_BACKSTEP_PX);
-          const backSpeed = -BASE_PX_PER_SEC * 4.0; // 小戻りは軽く速い
-          targetV = backSpeed;
-          const backUntil = t + 650; // 戻り時間
-
-          // backUntil までの間だけ「戻り」に寄せる
-          const follow = 0.06;
-          v = v + (targetV - v) * follow;
-          virtualY = clamp(virtualY + v * dt, 0, mx);
-          window.scrollTo(0, Math.round(virtualY));
-
-          // 戻りが終わったら前進へ復帰
-          if (t >= backUntil) retargetForward();
-
-          requestAnimationFrame(step);
-          return;
-        }
-      }
-
-      // 速度追従
-      const follow = (mode === 'rewind') ? REWIND_EASE : 0.06;
-      v = v + (targetV - v) * follow;
-
-      virtualY = clamp(virtualY + v * dt, 0, mx);
-      window.scrollTo(0, Math.round(virtualY));
-      requestAnimationFrame(step);
-    }
-
-    function toggle(){
-      clickCount += 1;
-      clicksEl.textContent = String(clickCount);
-
-      running = !running;
-
-      if (running) {
-        ignoreStopUntil = performance.now() + IGNORE_STOP_MS;
-
-        // 現在位置で初期化
-        virtualY = window.scrollY;
-
-        // もし途中で止めて再開したら、その位置に応じてモードを決める
-        const mx = maxScrollTop();
-        if (virtualY >= mx - EDGE_PADDING_PX) {
-          enterRewind();
-        } else if (virtualY <= 0 + EDGE_PADDING_PX) {
-          enterDown();
-        } else {
-          // 中間は基本 down
-          enterDown();
-        }
-
-        lastT = performance.now();
-        requestAnimationFrame(step);
-      }
-
-      updateDiag();
-    }
-
-    toggleBtn.addEventListener('click', toggle);
-  </script>
+toggleBtn.onclick=()=>{
+  running=!running;
+  stateEl.textContent = running?'on':'off';
+  runStateEl.textContent = stateEl.textContent;
+  if(running){
+    y=scrollY;
+    lastT=performance.now();
+    requestAnimationFrame(step);
+  }
+};
+</script>
 </body>
 </html>
