@@ -1,139 +1,129 @@
-<style>
-  :root{
-    --bg:#fff;
-    --text: rgba(0,0,0,0.90);
-    --muted: rgba(0,0,0,0.58);
-    --rule: rgba(0,0,0,0.10);
-    --human: rgba(0,0,0,0.78); /* 対話者 */
-    --ai:    rgba(0,0,0,0.90); /* AI */
-  }
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>record 2026-01-17</title>
+  <style>
+    :root{
+      --bg:#fff;
+      --text: rgba(0,0,0,0.90);
+      --muted: rgba(0,0,0,0.58);
+      --rule: rgba(0,0,0,0.10);
+      --human: rgba(0,0,0,0.78); /* 対話者 */
+      --ai:    rgba(0,0,0,0.90); /* AI */
+    }
 
-  html,body{
-    margin:0;
-    background:var(--bg);
-    color:var(--text);
-  }
+    html,body{
+      margin:0;
+      background:var(--bg);
+      color:var(--text);
+    }
 
-  body{
-    font-family: system-ui, -apple-system, "Segoe UI",
-                 "Hiragino Kaku Gothic ProN", "Yu Gothic", "Meiryo",
-                 "Noto Sans JP", sans-serif;
-    letter-spacing: 0.01em;
-    text-rendering: optimizeLegibility;
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
-  }
+    body{
+      font-family: system-ui, -apple-system, "Segoe UI",
+                   "Hiragino Kaku Gothic ProN", "Yu Gothic", "Meiryo",
+                   "Noto Sans JP", sans-serif;
+      letter-spacing: 0.01em;
+    }
 
-  main{
-    max-width: 620px;            /* 600→620：長文の圧迫感を少し減らす */
-    margin-left: auto;
-    margin-right: auto;
-    padding: 44px 18px 110px;    /* 下に少し余白 */
-  }
+    main{
+      max-width: 600px;
+      margin-left: auto;
+      margin-right: auto;
+      padding: 44px 18px 96px;
+    }
 
-  /* 冒頭（テンプレ） */
-  .preamble{
-    font-size: 13px;
-    line-height: 1.55;           /* 少しゆったり */
-    color: var(--human);
-    margin-bottom: 12px;
-  }
-  .preamble p{ margin:0; }
+    .preamble{
+      font-size: 13px;
+      line-height: 1.45;
+      color: var(--human);
+      margin-bottom: 10px;
+    }
+    .preamble p{ margin:0; }
 
-  .dates{
-    margin-top: 10px;
-    font-size: 12.5px;
-    line-height: 1.35;
-    color: var(--muted);
-    text-align: right;
-    letter-spacing: 0.02em;
-    font-variant-numeric: tabular-nums;
-  }
+    .dates{
+      margin-top: 8px;
+      font-size: 12.5px;
+      line-height: 1.35;
+      color: var(--muted);
+      text-align: right;
+      letter-spacing: 0.02em;
+      font-variant-numeric: tabular-nums;
+    }
 
-  hr{
-    border:none;
-    border-top:1px solid var(--rule);
-    margin: 14px 0 20px;
-  }
+    hr{
+      border:none;
+      border-top:1px solid var(--rule);
+      margin: 14px 0 18px;
+    }
 
-  /* ログ本体 */
-  .log{
-    font-size: 15.5px;
-    line-height: 1.60;           /* ★疲れにくさの要：1.42→1.60 */
-  }
+    .log{
+      font-size: 15.5px;
+      line-height: 1.42;
+    }
 
-  /* 1ターンの塊（余白を「段落の圧」から解放） */
-  .turn{
-    margin-top: 1.35em;          /* ★ターン間を少し広げる */
-  }
-  .turn:first-child{ margin-top: 0; }
+    .turn{ margin-top: 1.05em; }
+    .turn:first-child{ margin-top: 0; }
 
-  .speaker{
-    margin-bottom: 0.35em;
-    font-weight: 600;
-    letter-spacing: 0.02em;
-  }
+    .speaker{
+      margin-bottom: 0.28em;
+      font-weight: 600;
+      letter-spacing: 0.02em;
+    }
 
-  /* pの基本：段落間を作る（1行空けの代わり） */
-  .turn p{
-    margin: 0.45em 0 0;          /* ★段落内の呼吸 */
-    white-space: pre-wrap;        /* 既存の改行を活かす */
-    word-break: break-word;
-  }
-  .turn p:first-of-type{ margin-top: 0; }
+    .turn p{ margin: 0; }
 
-  /* 話者色 */
-  .speaker-human .speaker,
-  .speaker-human p{ color: var(--human); }
+    .speaker-human .speaker,
+    .speaker-human p{ color: var(--human); }
 
-  .speaker-ai .speaker,
-  .speaker-ai p{ color: var(--ai); }
+    .speaker-ai .speaker,
+    .speaker-ai p{ color: var(--ai); }
 
-  /* （コード出力あり）を「前後1行空け」相当で見せる */
-  /* 文字サイズ・濃さは変えない。余白だけ足す。 */
-  .turn p:where(:contains("（コード出力あり）")){
-    margin-top: 1em;
-    margin-bottom: 1em;
-  }
-  /* ↑CSSの :contains は標準化されていないので効かないブラウザがあります。
-     そこで確実にするため、HTML側で <p class="aside">（コード出力あり）</p> にしてOK。
-     classを付けた場合の確実ルールを下に用意しています。 */
+    /* 末尾の静かな終端線 */
+    .endline{
+      margin-top: 22px;
+      border-top: 1px solid var(--rule);
+    }
 
-  .turn p.aside{
-    margin: 1em 0;               /* ★前後1行ぶん */
-  }
+    /* 右下：timeline へ戻る（静か） */
+    a.fab{
+      position: fixed;
+      right: 14px;
+      bottom: 14px;
+      z-index: 9999;
+      display: inline-block;
+      padding: 10px 12px;
+      border: 1px solid rgba(0,0,0,0.12);
+      border-radius: 999px;
+      background: rgba(255,255,255,0.92);
+      backdrop-filter: blur(6px);
+      font-size: 12.5px;
+      color: var(--muted);
+      text-decoration: none;
+      user-select: none;
+    }
+    a.fab:hover{
+      text-decoration: underline;
+      text-decoration-color: rgba(0,0,0,0.25);
+    }
+  </style>
+</head>
 
-  /* 末尾の静かな終端線 */
-  .endline{
-    margin-top: 26px;
-    border-top: 1px solid var(--rule);
-  }
+<body>
+  <main>
 
-  /* 右下：timeline へ戻る（静か） */
-  a.fab{
-    position: fixed;
-    right: 14px;
-    bottom: 14px;
-    z-index: 9999;
-    display: inline-block;
-    padding: 10px 12px;
-    border: 1px solid rgba(0,0,0,0.12);
-    border-radius: 999px;
-    background: rgba(255,255,255,0.92);
-    backdrop-filter: blur(6px);
-    font-size: 12.5px;
-    color: var(--muted);
-    text-decoration: none;
-    user-select: none;
-  }
-  a.fab:hover{
-    text-decoration: underline;
-    text-decoration-color: rgba(0,0,0,0.25);
-  }
+    <!-- ここに preamble -->
 
-  /* 小さめ画面の可読性 */
-  @media (max-width: 420px){
-    .log{ font-size: 15px; line-height: 1.62; }
-    main{ padding: 36px 16px 110px; }
-  }
-</style>
+    <hr>
+
+    <div class="log">
+      <!-- ここに turn speaker-human / speaker-ai -->
+      <div class="endline"></div>
+    </div>
+
+  </main>
+
+  <a class="fab" href="timeline.html">timeline</a>
+</body>
+</html>
