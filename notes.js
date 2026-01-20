@@ -1,3 +1,8 @@
+// notes.js (for timeline.html)
+// - window.NOTES の辞書を提供
+// - data-note-key="..." を持つ要素に hover するとツールチップを出す
+// - 代替として title="..." が NOTES のキーと一致する場合も拾う（HTML変更を最小化）
+
 window.NOTES = {
   iliad: {
     title: "イリアス",
@@ -92,3 +97,137 @@ window.NOTES = {
     note: "ハイゼンベルクの著作。\n現代物理学の成果が哲学的思考に与える影響を描く。"
   }
 };
+
+(() => {
+  "use strict";
+
+  // ========== どの要素で説明を出すか ==========
+  // 推奨： data-note-key="iliad" のように NOTES のキーを指定
+  const KEY_ATTR = "data-note-key";
+
+  // 代替：HTMLを変えにくい場合、title="iliad" をキーとして扱う（NOTESに一致するもののみ）
+  const FALLBACK_TITLE_AS_KEY = true;
+
+  // ========== ツールチップDOM ==========
+  const tooltip = document.createElement("div");
+  tooltip.id = "note-tooltip";
+  tooltip.style.position = "fixed";
+  tooltip.style.left = "0px";
+  tooltip.style.top = "0px";
+  tooltip.style.transform = "translate(-9999px,-9999px)";
+  tooltip.style.maxWidth = "520px";
+  tooltip.style.padding = "10px 12px";
+  tooltip.style.borderRadius = "10px";
+  tooltip.style.boxShadow = "0 8px 24px rgba(0,0,0,.18)";
+  tooltip.style.background = "rgba(20,20,20,.92)";
+  tooltip.style.color = "#fff";
+  tooltip.style.fontSize = "13px";
+  tooltip.style.lineHeight = "1.6";
+  tooltip.style.zIndex = "999999";
+  tooltip.style.pointerEvents = "none";
+  tooltip.style.whiteSpace = "pre-line"; // \n を改行として表示
+  tooltip.style.opacity = "0";
+  tooltip.style.transition = "opacity .12s ease";
+
+  let activeEl = null;
+
+  const clamp = (n, min, max) => Math.min(Math.max(n, min), max);
+
+  const resolveKeyFromElement = (el) => {
+    if (!el) return null;
+
+    // 1) data-note-key
+    const k = el.getAttribute(KEY_ATTR);
+    if (k && window.NOTES && window.NOTES[k]) return k;
+
+    // 2) fallback: title をキーとして扱う（NOTESに一致する場合だけ）
+    if (FALLBACK_TITLE_AS_KEY) {
+      const t = el.getAttribute("title");
+      if (t && window.NOTES && window.NOTES[t]) return t;
+    }
+
+    return null;
+  };
+
+  const formatText = (entry) => {
+    if (!entry) return "";
+    const title = entry.title ? String(entry.title) : "";
+    const note = entry.note ? String(entry.note) : "";
+    // タイトルがある場合は先頭に出す（あなたのUIに合わせた最小の装飾）
+    if (title && note) return `${title}\n${note}`;
+    return title || note || "";
+  };
+
+  const show = (el, key) => {
+    const entry = window.NOTES?.[key];
+    if (!entry) return;
+
+    activeEl = el;
+    tooltip.textContent = formatText(entry);
+    tooltip.style.opacity = "1";
+  };
+
+  const hide = () => {
+    activeEl = null;
+    tooltip.style.opacity = "0";
+    tooltip.style.transform = "translate(-9999px,-9999px)";
+  };
+
+  const position = (clientX, clientY) => {
+    // カーソルの少し右下に表示
+    const pad = 14;
+
+    // 先に表示してからサイズ取得（opacityで制御）
+    const rect = tooltip.getBoundingClientRect();
+    const vw = document.documentElement.clientWidth;
+    const vh = document.documentElement.clientHeight;
+
+    let x = clientX + pad;
+    let y = clientY + pad;
+
+    x = clamp(x, 8, vw - rect.width - 8);
+    y = clamp(y, 8, vh - rect.height - 8);
+
+    tooltip.style.transform = `translate(${x}px, ${y}px)`;
+  };
+
+  const init = () => {
+    document.body.appendChild(tooltip);
+
+    // document 全体で拾う（後から生成される要素にも強い）
+    document.addEventListener("mouseover", (e) => {
+      const el = e.target?.closest?.(`[${KEY_ATTR}], [title]`);
+      if (!el) return;
+
+      const key = resolveKeyFromElement(el);
+      if (!key) return;
+
+      show(el, key);
+    }, { passive: true });
+
+    document.addEventListener("mousemove", (e) => {
+      if (!activeEl) return;
+      position(e.clientX, e.clientY);
+    }, { passive: true });
+
+    document.addEventListener("mouseout", (e) => {
+      if (!activeEl) return;
+
+      const related = e.relatedTarget;
+      // まだ同じ要素内にいるなら消さない
+      if (related && activeEl.contains(related)) return;
+
+      // 次のhover先が別の説明対象なら、mouseover側で更新されるのでここでは消さない
+      const next = related?.closest?.(`[${KEY_ATTR}], [title]`);
+      if (next) return;
+
+      hide();
+    }, { passive: true });
+  };
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", init);
+  } else {
+    init();
+  }
+})();
