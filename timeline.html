@@ -25,14 +25,53 @@
       max-width: 760px;
       margin-left: auto;
       margin-right: auto;
-      padding: 44px 18px 96px;
+      padding: 20px 18px 96px;
+      position: relative;
     }
 
+    /* ===== 先頭行（timeline + ログイン/本棚） ===== */
     h1{
+      display:flex;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: 12px;
+
       font-size: 16px;
-      font-weight: 600;
+      font-weight: 400;
       margin: 0 0 14px;
       letter-spacing: 0.02em;
+      color: var(--muted);
+    }
+
+/* timeline 表示だけを少し大きくする */
+h1 > a{
+  font-size: 20px;   /* ←ここを変えるだけ */
+}
+
+
+    h1 a{
+      color: inherit;
+      text-decoration: none;
+    }
+    h1 a:hover{
+      text-decoration: underline;
+      text-decoration-color: rgba(0,0,0,0.22);
+    }
+    h1 .nav{
+      display:inline-flex;
+      gap: 12px;
+      font-size: 13px;
+      letter-spacing: 0.02em;
+      white-space: nowrap;
+    }
+    h1 .nav a{
+      color: inherit;
+      text-decoration: none;
+    }
+    h1 .nav a:hover{
+      color: rgba(0,0,0,0.85);
+      text-decoration: underline;
+      text-decoration-color: rgba(0,0,0,0.22);
     }
 
     hr{
@@ -52,414 +91,194 @@
     ul{ margin: 0 0 0 1.15em; padding:0; }
     li{ margin: 6px 0; }
 
-    a{ color: var(--text); text-decoration: none; }
-    a:hover{
+    /* 本名だけ hover 対象 */
+    .item{
+      cursor: default;
+      color: var(--text);
+      text-decoration: none;
+    }
+    .item:hover{
       text-decoration: underline;
       text-decoration-color: rgba(0,0,0,0.25);
     }
-    a.stealth{ color: var(--text); text-decoration: none; }
-    a.stealth:hover{
+    .item:focus{
+      outline: none;
       text-decoration: underline;
-      text-decoration-color: rgba(0,0,0,0.22);
+      text-decoration-color: rgba(0,0,0,0.25);
     }
 
-    .scroll-dummy{ height: 1400px; }
-
-    .fab{
+    /* ===== 右上説明（透明・固定） ===== */
+    .note{
       position: fixed;
-      right: 14px;
-      bottom: 14px;
-      z-index: 999999;
-      display: inline-flex;
-      gap: 10px;
-      align-items: center;
-      padding: 10px 12px;
-      border: 1px solid rgba(0,0,0,0.12);
-      border-radius: 999px;
-      background: rgba(255,255,255,0.92);
-      backdrop-filter: blur(6px);
-      font-size: 12.5px;
-      color: var(--muted);
-      user-select: none;
-    }
-    .fab button{
-      border: none;
-      background: transparent;
-      padding: 0;
-      margin: 0;
-      font: inherit;
-      color: var(--text);
-      cursor: pointer;
-      letter-spacing: 0.02em;
-    }
-
-    .exp{
-      position: fixed;
-      top: 12px;
       right: 12px;
-      z-index: 999999;
-      padding: 10px 12px;
-      border: 1px solid rgba(0,0,0,0.12);
-      border-radius: 12px;
-      background: rgba(255,255,255,0.92);
-      backdrop-filter: blur(6px);
-      font-size: 12px;
-      color: var(--muted);
-      line-height: 1.35;
-      user-select: none;
-      font-variant-numeric: tabular-nums;
-      min-width: 190px;
-    }
-    .exp b{ color: var(--text); font-weight: 600; }
+      width: 280px;
+      max-width: calc(100vw - 24px);
+      min-height: 5.5em;
 
-    /* ===== 本を「遊ばせる」(ジグザグ横移動→戻る) ===== */
-    li.wiggle{
-      will-change: transform;
-      animation-name: wiggleZigzag;
-      animation-duration: var(--wiggle-dur, 3.6s);
-      animation-timing-function: ease-in-out;
-      animation-fill-mode: both;
+      background: transparent;
+      border: none;
+      padding: 0;
+
+      z-index: 999998;
+      color: var(--muted);
+      font-size: 12.5px;
+      line-height: 1.6;
+      white-space: pre-line;
+
+      pointer-events: none;
     }
-    @keyframes wiggleZigzag{
-      0%   { transform: translateX(0); }
-      12%  { transform: translateX(calc(var(--wiggle-amp, 26px) * 0.85)); }
-      24%  { transform: translateX(calc(var(--wiggle-amp, 26px) * -0.35)); }
-      38%  { transform: translateX(calc(var(--wiggle-amp, 26px) * 1.00)); }
-      55%  { transform: translateX(calc(var(--wiggle-amp, 26px) * -0.55)); }
-      72%  { transform: translateX(calc(var(--wiggle-amp, 26px) * 0.55)); }
-      86%  { transform: translateX(calc(var(--wiggle-amp, 26px) * -0.20)); }
-      100% { transform: translateX(0); }
+    .note .t{
+      color: var(--text);
+      font-weight: 600;
+      letter-spacing: 0.02em;
+      margin-bottom: 6px;
     }
   </style>
 </head>
 
 <body>
   <main>
-    <h1><a class="stealth" href="record-2026-01-15.html">年表（確認用）</a></h1>
+    <h1>
+      <!-- 表示は timeline。リンク先は年表のHTML（確認用） -->
+      <a href="record-2026-01-15.html" aria-label="年表（確認用）">timeline</a>
+      <span class="nav">
+        <a href="/login">ログイン</a>
+        <a href="/shelf">本棚</a>
+      </span>
+    </h1>
+
     <hr>
 
     <h2>前8世紀頃</h2>
     <ul>
-      <li>イリアス　［制作中］</li>
-      <li>オデュッセイア　［制作中］</li>
+      <li><span class="item" data-key="iliad" tabindex="0">イリアス</span>　［制作中］</li>
+      <li><span class="item" data-key="odyssey" tabindex="0">オデュッセイア</span>　［制作中］</li>
     </ul>
 
     <h2>前7世紀</h2>
-    <ul><li>神統記　［制作中］</li></ul>
+    <ul><li><span class="item" data-key="theogony" tabindex="0">神統記</span>　［制作中］</li></ul>
 
     <h2>前4世紀</h2>
     <ul>
-      <li>ティマイオス　［制作中］</li>
-      <li>形而上学　［制作中］</li>
-      <li>国家　［制作中］</li>
+      <li><span class="item" data-key="timaeus" tabindex="0">ティマイオス</span>　［制作中］</li>
+      <li><span class="item" data-key="metaphysics" tabindex="0">形而上学</span>　［制作中］</li>
+      <li><span class="item" data-key="republic" tabindex="0">国家</span>　［制作中］</li>
     </ul>
 
     <h2>1687</h2>
-    <ul><li>プリンキピア　［制作中］</li></ul>
+    <ul><li><span class="item" data-key="principia" tabindex="0">プリンキピア</span>　［制作中］</li></ul>
 
     <h2>1781</h2>
-    <ul><li>純粋理性批判　［制作中］</li></ul>
+    <ul><li><span class="item" data-key="critique_pure_reason" tabindex="0">純粋理性批判</span>　［制作中］</li></ul>
 
     <h2>1790</h2>
-    <ul><li>判断力批判　［制作中］</li></ul>
+    <ul><li><span class="item" data-key="critique_judgment" tabindex="0">判断力批判</span>　［制作中］</li></ul>
 
     <h2>1807</h2>
-    <ul><li>精神現象学　［制作中］</li></ul>
+    <ul><li><span class="item" data-key="phenomenology_spirit" tabindex="0">精神現象学</span>　［制作中］</li></ul>
 
     <h2>1812</h2>
-    <ul><li>論理学（第一巻）　［制作中］</li></ul>
+    <ul><li><span class="item" data-key="science_logic_v1" tabindex="0">論理学（第一巻）</span>　［制作中］</li></ul>
 
     <h2>1844</h2>
-    <ul><li>経済学・哲学草稿　［制作中］</li></ul>
+    <ul><li><span class="item" data-key="econ_philo_1844" tabindex="0">経済学・哲学草稿</span>　［制作中］</li></ul>
 
     <h2>1859</h2>
-    <ul><li>種の起源　［制作中］</li></ul>
+    <ul><li><span class="item" data-key="origin_species" tabindex="0">種の起源</span>　［制作中］</li></ul>
 
     <h2>1886</h2>
-    <ul><li>善悪の彼岸　［制作中］</li></ul>
+    <ul><li><span class="item" data-key="beyond_good_evil" tabindex="0">善悪の彼岸</span>　［制作中］</li></ul>
 
     <h2>1900</h2>
     <ul>
-      <li>論理哲学論考（草）　［制作中］</li>
-      <li>数学原理（抄）　［制作中］</li>
+      <li><span class="item" data-key="tractatus_draft" tabindex="0">論理哲学論考（草）</span>　［制作中］</li>
+      <li><span class="item" data-key="principia_mathematica_excerpt" tabindex="0">数学原理（抄）</span>　［制作中］</li>
     </ul>
 
     <h2>1927</h2>
-    <ul><li>存在と時間　［制作中］</li></ul>
+    <ul><li><span class="item" data-key="being_time" tabindex="0">存在と時間</span>　［制作中］</li></ul>
 
     <h2>1929</h2>
-    <ul><li>過程と実在　［制作中］</li></ul>
+    <ul><li><span class="item" data-key="process_reality" tabindex="0">過程と実在</span>　［制作中］</li></ul>
 
     <h2>1936</h2>
     <ul>
-      <li>芸術作品の複製技術時代　［制作中］</li>
-      <li>科学革命の構造（草）　［制作中］</li>
+      <li><span class="item" data-key="work_art_mechanical_repro" tabindex="0">芸術作品の複製技術時代</span>　［制作中］</li>
+      <li><span class="item" data-key="structure_scientific_revolutions_draft" tabindex="0">科学革命の構造（草）</span>　［制作中］</li>
     </ul>
 
     <h2>1953</h2>
     <ul>
-      <li>哲学探究　［制作中］</li>
-      <li>方法序説（再読）　［制作中］</li>
+      <li><span class="item" data-key="philosophical_investigations" tabindex="0">哲学探究</span>　［制作中］</li>
+      <li><span class="item" data-key="discourse_method_reread" tabindex="0">方法序説（再読）</span>　［制作中］</li>
     </ul>
 
     <h2>1958</h2>
-    <ul><li>物理学と哲学　［制作中］</li></ul>
+    <ul><li><span class="item" data-key="physics_philosophy" tabindex="0">物理学と哲学</span>　［制作中］</li></ul>
 
     <h2>2025</h2>
     <ul>
-      <li>原典翻訳プロジェクト（断片）　［制作中］</li>
-      <li>科学と哲学のあいだ（草）　［制作中］</li>
+      <li><span class="item" data-key="original_translation_fragments_2025" tabindex="0">原典翻訳プロジェクト（断片）</span>　［制作中］</li>
+      <li><span class="item" data-key="between_science_philosophy_draft" tabindex="0">科学と哲学のあいだ（草）</span>　［制作中］</li>
     </ul>
 
     <h2 id="last">2026</h2>
     <ul>
-      <li>物とは何か（原稿）　［制作中］</li>
-      <li>哲学者たちは、物をどう捉えてきたのか（原稿）　［制作中］</li>
-      <li>本_倫理（構想）　［制作中］</li>
-      <li>対話記録：AIと哲学（断片）　［制作中］</li>
-      <li>散歩の記録（断片）　［制作中］</li>
+      <li><span class="item" data-key="what_is_thing_ms" tabindex="0">物とは何か（原稿）</span>　［制作中］</li>
+      <li><span class="item" data-key="how_philosophers_grasped_things_ms" tabindex="0">哲学者たちは、物をどう捉えてきたのか（原稿）</span>　［制作中］</li>
+      <li><span class="item" data-key="hon_rinri_plan" tabindex="0">本_倫理（構想）</span>　［制作中］</li>
+      <li><span class="item" data-key="dialogue_ai_philosophy_fragments" tabindex="0">対話記録：AIと哲学（断片）</span>　［制作中］</li>
+      <li><span class="item" data-key="walk_fragments" tabindex="0">散歩の記録（断片）</span>　［制作中］</li>
     </ul>
   </main>
 
-  <div class="scroll-dummy" aria-hidden="true"></div>
+  <aside class="note" id="note" aria-live="polite"></aside>
 
-  <div class="exp" id="exp">
-    <div><b>EXP 9</b></div>
-    <div>mode: <span id="mode">down</span></div>
-    <div>state: <span id="runstate">off</span></div>
-    <div>y/max: <span id="pos">0</span>/<span id="max">0</span></div>
-  </div>
-
-  <div class="fab" id="fab">
-    <button id="toggle" type="button">walk</button>
-    <span class="state" id="state">off</span>
-  </div>
-
+  <script src="./notes.js"></script>
   <script>
   (() => {
-    const toggleBtn = document.getElementById('toggle');
-    const stateEl = document.getElementById('state');
-    const runStateEl = document.getElementById('runstate');
-    const modeEl = document.getElementById('mode');
-    const posEl = document.getElementById('pos');
-    const maxEl = document.getElementById('max');
-    const lastEl = document.getElementById('last');
+    const box = document.getElementById('note');
+    const NOTES = window.NOTES || {};
 
-    // ===== 指定 =====
-    const BASE = 1.2;
-    const FORWARD_MULT = 10;   // 進む：10倍
-    const BACKSTEP_MULT = 3;   // 小戻り：3倍
-    const REWIND_MULT  = 30;   // 巻き戻し：30倍
-    const WANDER = 0.30;       // 周期呼吸なし（微ゆらぎのみ）
+    function clear(){ box.textContent = ''; }
 
-    const PAUSE_CHANCE = 0.008;
-    const BACKSTEP_CHANCE = 0.004;
-    const MAX_BACKSTEP_PX = 90;
-    const BACKSTEP_DURATION_MS = 650;
+    function render(key){
+      const obj = NOTES[key];
+      if(!obj){ clear(); return; }
+      box.innerHTML = '';
 
-    // ===== 本を遊ばせる（walk中ランダム） =====
-    const WIGGLE_CHANCE = 0.006;      // 低確率（フレーム単位）
-    const WIGGLE_COOLDOWN_MS = 900;   // 連発防止
-    const WIGGLE_MIN_MS = 3000;
-    const WIGGLE_MAX_MS = 4000;
-    const WIGGLE_MIN_PX = 16;
-    const WIGGLE_MAX_PX = 34;
+      const t = document.createElement('div');
+      t.className = 't';
+      t.textContent = obj.title || '';
 
-    const EDGE_PAD = 10;
-    const TRIGGER_PAD = 12;
-    const IGNORE_STOP_MS = 380;
+      const n = document.createElement('div');
+      n.textContent = obj.note || '';
 
-    const clamp = (x,a,b)=>Math.max(a, Math.min(b,x));
-    const rand = (a,b)=>a + Math.random()*(b-a);
-
-    const allItems = Array.from(document.querySelectorAll('main li'));
-    let wiggleBusy = false;
-    let lastWiggleAt = 0;
-
-    function wiggleOne(){
-      if (wiggleBusy) return;
-      const now = performance.now();
-      if (now - lastWiggleAt < WIGGLE_COOLDOWN_MS) return;
-      if (!allItems.length) return;
-
-      const el = allItems[Math.floor(Math.random() * allItems.length)];
-      if (!el) return;
-
-      wiggleBusy = true;
-      lastWiggleAt = now;
-
-      const dur = Math.round(rand(WIGGLE_MIN_MS, WIGGLE_MAX_MS));
-      const amp = Math.round(rand(WIGGLE_MIN_PX, WIGGLE_MAX_PX));
-      const dir = (Math.random() < 0.5) ? -1 : 1;
-
-      el.style.setProperty('--wiggle-dur', dur + 'ms');
-      el.style.setProperty('--wiggle-amp', (amp * dir) + 'px');
-
-      const cleanup = () => {
-        el.classList.remove('wiggle');
-        el.style.removeProperty('--wiggle-dur');
-        el.style.removeProperty('--wiggle-amp');
-        el.removeEventListener('animationend', cleanup);
-        wiggleBusy = false;
-      };
-
-      el.addEventListener('animationend', cleanup, { once:true });
-      el.classList.remove('wiggle'); // 再発火のため
-      void el.offsetWidth;
-      el.classList.add('wiggle');
+      box.appendChild(t);
+      box.appendChild(n);
     }
 
-    const maxScroll = () => {
-      const doc = document.documentElement;
-      const h = Math.max(doc.scrollHeight, document.body ? document.body.scrollHeight : 0);
-      return Math.max(0, h - innerHeight);
-    };
-
-    const triggerY = () => {
-      const mx = maxScroll();
-      const lastBottomAbs = lastEl.offsetTop + lastEl.offsetHeight;
-      const y = lastBottomAbs - innerHeight + TRIGGER_PAD;
-      return clamp(y, 0, mx);
-    };
-
-    let running = false;
-    let mode = 'down';
-    let lastT = performance.now();
-
-    let y = 0;
-    let v = BASE;
-    let targetV = BASE * FORWARD_MULT;
-
-    let pausedUntil = 0;
-    let backModeUntil = 0;
-    let ignoreStopUntil = 0;
-
-    function updateDiag(){
-      stateEl.textContent = running ? 'on' : 'off';
-      runStateEl.textContent = running ? 'on' : 'off';
-      modeEl.textContent = mode;
-      posEl.textContent = String(Math.round(window.scrollY));
-      maxEl.textContent = String(Math.round(maxScroll()));
-    }
-    updateDiag();
-    addEventListener('scroll', updateDiag, {passive:true});
-    addEventListener('resize', updateDiag);
-
-    function enterDown(){
-      mode = 'down';
-      const wiggle = 1 + rand(-WANDER, WANDER);
-      targetV = (BASE * FORWARD_MULT) * wiggle;
-      pausedUntil = 0;
-      backModeUntil = 0;
-      updateDiag();
+    function positionNoteUnderHr(){
+      const hr = document.querySelector('main hr');
+      if(!hr) return;
+      const r = hr.getBoundingClientRect();
+      const top = Math.max(12, Math.round(r.bottom + 10));
+      box.style.top = top + 'px';
     }
 
-    function enterRewind(){
-      mode = 'rewind';
-      targetV = -BASE * REWIND_MULT;
-      pausedUntil = 0;
-      backModeUntil = 0;
-      updateDiag();
-    }
+    positionNoteUnderHr();
+    addEventListener('scroll', positionNoteUnderHr, { passive:true });
+    addEventListener('resize', positionNoteUnderHr);
 
-    function stop(){
-      if (performance.now() < ignoreStopUntil) return;
-      if (!running) return;
-      running = false;
-      updateDiag();
-    }
-
-    addEventListener('wheel', stop, {passive:true});
-    addEventListener('mousedown', (e) => {
-      if (e.target && e.target.closest && e.target.closest('#fab')) return;
-      stop();
+    document.querySelectorAll('main .item[data-key]').forEach(el => {
+      const key = el.getAttribute('data-key');
+      el.addEventListener('mouseenter', () => render(key));
+      el.addEventListener('mouseleave', clear);
+      el.addEventListener('focus', () => render(key));
+      el.addEventListener('blur', clear);
     });
-    addEventListener('keydown', stop);
-    addEventListener('touchstart', (e) => {
-      if (e.target && e.target.closest && e.target.closest('#fab')) return;
-      stop();
-    }, {passive:true});
 
-    function step(t){
-      if (!running) return;
-
-      const dt = (t - lastT) / 1000;
-      lastT = t;
-
-      const mx = maxScroll();
-      if (mx <= 0) { stop(); return; }
-
-      // walk中：ランダムに「本を遊ばせる」
-      if (Math.random() < WIGGLE_CHANCE) wiggleOne();
-
-      if (mode === 'down') {
-        if (y >= triggerY()) {
-          enterRewind();
-        }
-      } else {
-        if (y <= EDGE_PAD) {
-          y = 0;
-          scrollTo(0, 0);
-          enterDown();
-        }
-      }
-
-      if (mode === 'down') {
-        if (t < pausedUntil) { requestAnimationFrame(step); return; }
-
-        if (t >= backModeUntil && Math.random() < PAUSE_CHANCE) {
-          pausedUntil = t + rand(450, 2300);
-          requestAnimationFrame(step);
-          return;
-        }
-
-        if (t >= backModeUntil && Math.random() < BACKSTEP_CHANCE) {
-          const back = rand(20, MAX_BACKSTEP_PX);
-          targetV = -BASE * BACKSTEP_MULT;
-
-          const desiredMin = clamp(y - back, 0, mx);
-          backModeUntil = t + BACKSTEP_DURATION_MS;
-
-          if (y <= desiredMin + 0.5) {
-            backModeUntil = 0;
-            enterDown();
-          }
-        }
-
-        if (t >= backModeUntil && targetV < 0) {
-          enterDown();
-        }
-      }
-
-      const follow = (mode === 'rewind') ? 0.14 : 0.06;
-      v = v + (targetV - v) * follow;
-
-      y = clamp(y + v * dt, 0, mx);
-      scrollTo(0, Math.round(y));
-
-      requestAnimationFrame(step);
-    }
-
-    function toggle(){
-      const turningOn = !running;
-      running = !running;
-
-      if (turningOn) {
-        ignoreStopUntil = performance.now() + IGNORE_STOP_MS;
-
-        // OFF→ON：必ず前進から開始
-        mode = 'down';
-        y = window.scrollY;
-        lastT = performance.now();
-        enterDown();
-
-        requestAnimationFrame(step);
-      } else {
-        updateDiag();
-      }
-    }
-
-    toggleBtn.addEventListener('click', toggle);
+    clear();
   })();
   </script>
 </body>
