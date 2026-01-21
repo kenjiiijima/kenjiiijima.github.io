@@ -1,0 +1,358 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>本棚</title>
+
+<style>
+:root{
+  --bg:#fff;
+  --text: rgba(0,0,0,0.90);
+  --muted: rgba(0,0,0,0.45);
+  --rule: rgba(0,0,0,0.10);
+  --owned:#000;
+  --unowned: rgba(0,0,0,0.35);
+  --sep: rgba(0,0,0,0.18);
+}
+
+html,body{ margin:0; background:var(--bg); color:var(--text); }
+body{
+  font-family: system-ui, -apple-system, "Segoe UI",
+               "Hiragino Kaku Gothic ProN", "Yu Gothic", "Meiryo",
+               "Noto Sans JP", sans-serif;
+  line-height: 1.45;
+  letter-spacing: 0.01em;
+}
+
+main{
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 18px 16px 96px;
+}
+
+h1{
+  font-size: 16px;
+  font-weight: 400;
+  margin: 0 0 8px;
+  color: var(--muted);
+}
+h1 a{
+  color: inherit;
+  text-decoration: none;
+}
+h1 a:hover{
+  text-decoration: underline;
+  text-decoration-color: rgba(0,0,0,0.22);
+}
+
+table{
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+  table-layout: fixed;
+  padding-left: 2ch; /* 左端の“呼吸” */
+}
+
+/* 年列を固定して、年と本名の間が勝手に広がるのを防ぐ */
+col.col-year{ width: 6ch; }
+col.col-book{ width: auto; }
+
+tbody td{
+  padding: 6px 4px;
+  border-bottom: 1px solid var(--rule);
+  vertical-align: top;
+}
+tbody tr:last-child td{ border-bottom: none; }
+
+/* 本名側の寄せ */
+tbody td + td{
+  padding-left: 0.4ch;
+}
+
+/* 年 */
+.year{
+  color: var(--muted);
+  white-space: nowrap;
+}
+
+/* 本名：1行固定（長い場合は …） */
+.book{
+  cursor: pointer;
+  text-decoration: none;
+  display: inline-block;
+  max-width: 100%;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.owned{ color: var(--owned); font-weight: 500; }
+.unowned{ color: var(--unowned); }
+
+.book:hover{
+  text-decoration: underline;
+  text-decoration-color: rgba(0,0,0,0.25);
+}
+
+/* 分類：上下線同じ太さ、文字は中央寄せ */
+tr.sep td{
+  border-top: 2px solid var(--sep);
+  border-bottom: 2px solid var(--sep);
+  padding-top: 10px;
+  padding-bottom: 10px;
+}
+.catnote{
+  font-size: 12.5px;
+  color: var(--muted);
+  text-align: center;
+  padding: 0;
+}
+
+/* ===== 左下フローティング i と右側パネル ===== */
+.helpWrap{
+  position: fixed;
+  left: 14px;
+  bottom: 24px;
+  display: flex;
+  align-items: flex-end;
+  gap: 10px;
+  z-index: 999999;
+}
+
+.helpbtn{
+  width: 34px;
+  height: 34px;
+  border-radius: 999px;
+  background: rgba(255,255,255,0.88);
+  border: 1px solid rgba(0,0,0,0.12);
+  color: rgba(0,0,0,0.60);
+  display: grid;
+  place-items: center;
+  font-size: 14px;
+  line-height: 1;
+  cursor: pointer;
+  user-select: none;
+}
+.helpbtn:hover{
+  border-color: rgba(0,0,0,0.18);
+  color: rgba(0,0,0,0.78);
+}
+.helpbtn[aria-pressed="true"]{
+  color: rgba(0,0,0,0.88);
+  border-color: rgba(0,0,0,0.22);
+}
+
+/* パネル：iの右側に出す（デフォルト非表示） */
+.panel{
+  width: 280px;
+  max-width: calc(100vw - 14px - 34px - 10px - 14px);
+  background: rgba(255,255,255,0.92);
+  border: 1px solid rgba(0,0,0,0.10);
+  border-radius: 14px;
+  padding: 10px 12px 12px;
+  box-shadow: 0 8px 28px rgba(0,0,0,0.08);
+  color: var(--muted);
+  font-size: 12.5px;
+  line-height: 1.6;
+  white-space: pre-line;
+
+  display: none;
+}
+.panel.show{ display:block; }
+
+.panel .t{
+  color: var(--text);
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  margin-bottom: 6px;
+}
+
+/* パネル内リンク（将来用） */
+.panel a{
+  color: inherit;
+  text-decoration: underline;
+  text-decoration-color: rgba(0,0,0,0.18);
+}
+
+/* スマホ：パネルを少し大きく（読みやすく） */
+@media (max-width: 520px){
+  .panel{
+    width: 320px;
+    max-width: calc(100vw - 14px - 34px - 10px - 14px);
+  }
+}
+</style>
+</head>
+
+<body>
+<main>
+  <h1><a href="timeline.html">timeline</a> / 本棚</h1>
+
+  <table>
+    <colgroup>
+      <col class="col-year">
+      <col class="col-book">
+    </colgroup>
+
+    <tbody>
+      <!-- 分類：AI翻訳本 -->
+      <tr class="sep">
+        <td colspan="2" class="catnote">AI翻訳本</td>
+      </tr>
+      <tr>
+        <td class="year">2026</td>
+        <td>
+          <span class="book owned" data-key="metaphysics">
+            形而上学（アリストテレス）
+          </span>
+        </td>
+      </tr>
+
+      <!-- 分類：AI翻訳＋定義例 -->
+      <tr class="sep">
+        <td colspan="2" class="catnote">AI翻訳＋定義例</td>
+      </tr>
+      <tr>
+        <td class="year">2026</td>
+        <td>
+          <span class="book unowned"
+                data-key="how_philosophers_grasped_things_ms"
+                data-buy="buy-how-philosophers.html">
+            哲学者たちは、物をどう捉えてきたのか
+          </span>
+        </td>
+      </tr>
+
+      <!-- 分類：対話本 -->
+      <tr class="sep">
+        <td colspan="2" class="catnote">対話本</td>
+      </tr>
+      <tr>
+        <td class="year">2026</td>
+        <td>
+          <span class="book unowned"
+                data-key="dialogue_ai_philosophy_fragments"
+                data-buy="buy-dialogue.html">
+            対話記録：AIと哲学
+          </span>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</main>
+
+<!-- 左下：i + パネル -->
+<div class="helpWrap" aria-live="polite">
+  <div class="helpbtn" id="helpBtn" role="button" tabindex="0" aria-label="このページの見方" aria-pressed="false">i</div>
+  <aside class="panel" id="panel">
+    <div class="t" id="panelTitle"></div>
+    <div id="panelBody"></div>
+  </aside>
+</div>
+
+<script src="./notes.js"></script>
+<script>
+(() => {
+  const NOTES = window.NOTES || {};
+  const helpBtn = document.getElementById('helpBtn');
+  const panel = document.getElementById('panel');
+  const panelTitle = document.getElementById('panelTitle');
+  const panelBody = document.getElementById('panelBody');
+
+  const BASE_KEY = 'metaphysics';
+
+  const HELP = {
+    title: 'このページの見方',
+    note:
+`この本棚は、一覧として眺めるためのページです。
+本の名前にカーソルを置くと、内容が表示されます。
+
+未購入の本は、購入を検討するための情報が表示されます。
+購入済みの本は、比較の基準として表示されます。
+
+※ Shiftキーを押しながらカーソルを置くと、
+　基準の本と並べて表示されます。`
+  };
+
+  let mode = 'closed'; // 'closed' | 'help' | 'note'
+
+  function render(obj){
+    if(!obj){ panelTitle.textContent=''; panelBody.textContent=''; return; }
+    panelTitle.textContent = obj.title || '';
+    panelBody.textContent = obj.note || '';
+  }
+
+  function openHelp(){
+    mode = 'help';
+    helpBtn.setAttribute('aria-pressed', 'true');
+    panel.classList.add('show');
+    render(HELP);
+  }
+
+  function openNote(key){
+    mode = 'note';
+    helpBtn.setAttribute('aria-pressed', 'true');
+    panel.classList.add('show');
+    render(NOTES[key] || { title:'', note:'' });
+  }
+
+  function closePanel(){
+    mode = 'closed';
+    helpBtn.setAttribute('aria-pressed', 'false');
+    panel.classList.remove('show');
+  }
+
+  function toggleHelp(){
+    if(mode === 'help') closePanel();
+    else openHelp();
+  }
+
+  // i ボタン操作
+  helpBtn.addEventListener('click', toggleHelp);
+  helpBtn.addEventListener('keydown', (e) => {
+    if(e.key === 'Enter' || e.key === ' '){
+      e.preventDefault();
+      toggleHelp();
+    }
+    if(e.key === 'Escape') closePanel();
+  });
+
+  addEventListener('keydown', (e) => {
+    if(e.key === 'Escape') closePanel();
+  });
+
+  // 本名 hover で表示（パネルが閉じているときは、基準を開く）
+  document.querySelectorAll('.book').forEach(el => {
+    const key = el.getAttribute('data-key');
+    const buy = el.getAttribute('data-buy');
+
+    el.addEventListener('mouseenter', () => {
+      // ヘルプ表示中は上書きしない
+      if(mode === 'help') return;
+
+      // パネルが閉じている/ノート表示中は、ノート表示へ
+      openNote(key);
+    });
+
+    el.addEventListener('mouseleave', () => {
+      // ヘルプ表示中はそのまま
+      if(mode === 'help') return;
+
+      // 何も触れていない状態は閉じる（静けさ優先）
+      closePanel();
+    });
+
+    // 未購入のみ購入ページへ
+    if(buy){
+      el.addEventListener('click', () => location.href = buy);
+    }
+  });
+
+  // 初期：パネルは閉じたまま（静けさ）
+  // もし「基準を常時見える状態」にしたい場合は次の1行を有効化：
+  // openNote(BASE_KEY);
+
+})();
+</script>
+</body>
+</html>
