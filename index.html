@@ -1,105 +1,408 @@
-// notes.js
-// index.html と同じフォルダに置く
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>timeline</title>
 
-window.NOTES = {
+  <style>
+    :root{
+      --bg:#fff;
+      --text: rgba(0,0,0,0.90);
+      --muted: rgba(0,0,0,0.58);
+      --rule: rgba(0,0,0,0.10);
+    }
+    html,body{ margin:0; background:var(--bg); color:var(--text); }
+    body{
+      font-family: system-ui, -apple-system, "Segoe UI",
+                   "Hiragino Kaku Gothic ProN", "Yu Gothic", "Meiryo",
+                   "Noto Sans JP", sans-serif;
+      letter-spacing: 0.01em;
+      line-height: 1.55;
+    }
 
-  // ===== 哲学以前（西洋） =====
-  iliad: {
-    title: "イリアス",
-    note: "ホメロスによる叙事詩。怒り・名誉・死が、世界の骨格として語られる。"
-  },
-  odyssey: {
-    title: "オデュッセイア",
-    note: "ホメロスによる叙事詩。遍歴と帰還の中で、知恵と場が試される。"
-  },
-  theogony: {
-    title: "神統記",
-    note: "ヘシオドス。神々の系譜と抗争として、世界秩序の成立が語られる。"
-  },
+    main{
+      max-width: 760px;
+      margin-left: auto;
+      margin-right: auto;
+      padding: 20px 18px 96px;
+      position: relative;
+    }
 
-  // ===== 古代哲学 =====
-  de_anima: {
-    title: "魂について",
-    note: "アリストテレス。生きているものを成り立たせる原理としての魂を問う。"
-  },
+    h1{
+      display:flex;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: 12px;
 
-metaphysics: {
-  title: "形而上学",
-  note: "アリストテレス。存在の第一原理を問う。物は何として在るのかを探る。"
-},
+      font-size: 16px;
+      font-weight: 400;
+      margin: 0 0 14px;
+      letter-spacing: 0.02em;
+      color: var(--muted);
+    }
+    h1 > a{ font-size: 20px; }
 
-  // ===== 日本古典（型としての思考） =====
-  manyoshu: {
-    title: "万葉集",
-    note: "人が生き、詠み、残した言葉の集積。意味は後から追いついてくる。"
-  },
-  fushikaden: {
-    title: "風姿花伝",
-    note: "世阿弥。芸が生まれ、伝わり、洗練される型を言葉にした書。"
-  },
-  oku_no_hosomichi: {
-    title: "奥の細道",
-    note: "松尾芭蕉。移動する身体の中で、世界が詩として立ち上がる。"
-  },
-  book_of_tea: {
-    title: "茶の本",
-    note: "岡倉天心。日常の所作に、世界観と美の型が宿ることを示す。"
-  },
+    h1 a{
+      color: inherit;
+      text-decoration: none;
+    }
+    h1 a:hover{
+      text-decoration: underline;
+      text-decoration-color: rgba(0,0,0,0.22);
+    }
+    h1 .nav{
+      display:inline-flex;
+      gap: 12px;
+      font-size: 13px;
+      letter-spacing: 0.02em;
+      white-space: nowrap;
+    }
+    h1 .nav a{
+      color: inherit;
+      text-decoration: none;
+    }
+    h1 .nav a:hover{
+      color: rgba(0,0,0,0.85);
+      text-decoration: underline;
+      text-decoration-color: rgba(0,0,0,0.22);
+    }
 
-  // ===== 科学 =====
-  principia: {
-    title: "プリンキピア",
-    note: "世界が、数理という型で記述できることを示した決定的な書。"
-  },
-  origin_species: {
-    title: "種の起源",
-    note: "ダーウィン。形は固定ではなく、過程として生まれることを示した。"
-  },
-  what_is_life: {
-    title: "生命とは何か",
-    note: "シュレーディンガー。生命を物理の言葉で捉え直そうとした試み。"
-  },
-  cybernetics: {
-    title: "サイバネティクス",
-    note: "制御と通信。機械・生物・社会を横断する思考の枠組み。"
-  },
+    hr{
+      border:none;
+      border-top:1px solid var(--rule);
+      margin: 16px 0 18px;
+    }
 
-  // ===== 近代哲学 =====
-  critique_pure_reason: {
-    title: "純粋理性批判",
-    note: "カント。世界はどのように可能な経験として立ち上がるのか。"
-  },
-  phenomenology_spirit: {
-    title: "精神現象学",
-    note: "ヘーゲル。意識は経験を通して世界へと至る。"
-  },
+    h2{
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--muted);
+      margin: 22px 0 10px;
+      letter-spacing: 0.02em;
+    }
 
-  // ===== 20世紀哲学 =====
-  tractatus: {
-    title: "論理哲学論考",
-    note: "物ではなく、「物と言うこと」の条件を問う。世界の輪郭は言語に現れる。"
-  },
-  being_time: {
-    title: "存在と時間",
-    note: "ハイデガー。物ではなく、存在が開かれる仕方を問う。"
-  },
-  process_reality: {
-    title: "過程と実在",
-    note: "物を生成として捉え直す、形而上学の再構築。"
-  },
-  phenomenology_perception: {
-    title: "知覚の現象学",
-    note: "メルロ＝ポンティ。世界はまず身体によって開かれる。"
-  },
-  philosophical_investigations: {
-    title: "哲学探究",
-    note: "意味は使用の中にある。言語は生活形式として働く。"
-  },
+    ul{ margin: 0 0 0 1.15em; padding:0; }
+    li{ margin: 6px 0; }
 
-  // ===== 科学史 =====
-  structure_scientific_revolutions: {
-    title: "科学革命の構造",
-    note: "科学は直線ではなく、枠組み（パラダイム）の転換で進む。"
-  }
+    .item{
+      cursor: default;
+      color: var(--text);
+      text-decoration: none;
+    }
+    .item:hover{
+      text-decoration: underline;
+      text-decoration-color: rgba(0,0,0,0.25);
+    }
+    .item:focus{
+      outline: none;
+      text-decoration: underline;
+      text-decoration-color: rgba(0,0,0,0.25);
+    }
 
-};
+    /* ===== 説明ボックス ===== */
+    .note{
+      position: fixed;
+      right: 12px;
+      width: 280px;
+      max-width: calc(100vw - 24px);
+      min-height: 5.5em;
+      background: transparent;
+      border: none;
+      padding: 0;
+      z-index: 999998;
+      color: var(--muted);
+      font-size: 12.5px;
+      line-height: 1.6;
+      white-space: pre-line;
+      pointer-events: none;
+
+      /* そろっと立ち上がるための下準備 */
+      will-change: transform, opacity;
+    }
+    .note .t{
+      color: var(--text);
+      font-weight: 600;
+      letter-spacing: 0.02em;
+      margin-bottom: 6px;
+    }
+
+    /* スマホ：下フローティング（静かに出る） */
+    @media (max-width: 720px){
+      .note{
+        left: 12px;
+        right: 12px;
+        width: auto;
+        top: auto !important;
+        bottom: 12px;
+
+        padding: 10px 12px;
+        border: 1px solid var(--rule);
+        border-radius: 12px;
+        background: rgba(255,255,255,0.92);
+        backdrop-filter: blur(4px);
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <main>
+    <h1>
+      <a href="record-2026-01-15.html" aria-label="年表（確認用）">timeline</a>
+      <span class="nav">
+        <a href="shelf.html">本棚</a>
+      </span>
+    </h1>
+
+    <hr>
+
+    <h2>前8世紀頃</h2>
+    <ul>
+      <li><span class="item" data-key="iliad" tabindex="0">イリアス</span>　［制作中］</li>
+      <li><span class="item" data-key="odyssey" tabindex="0">オデュッセイア</span>　［制作中］</li>
+    </ul>
+
+    <h2>前7世紀</h2>
+    <ul>
+      <li><span class="item" data-key="theogony" tabindex="0">神統記</span>　［制作中］</li>
+    </ul>
+
+    <h2>前4世紀</h2>
+    <ul>
+      <li><span class="item" data-key="de_anima" tabindex="0">魂について</span>　［制作中］</li>
+	  <li><span class="item" data-key="metaphysics" tabindex="0">形而上学</span>　［制作中］</li>
+    </ul>
+
+    <h2>8世紀</h2>
+    <ul>
+      <li><span class="item" data-key="manyoshu" tabindex="0">万葉集</span>　［制作中］</li>
+    </ul>
+
+    <h2>15世紀</h2>
+    <ul>
+      <li><span class="item" data-key="fushikaden" tabindex="0">風姿花伝</span>　［制作中］</li>
+    </ul>
+
+    <h2>1687</h2>
+    <ul>
+      <li><span class="item" data-key="principia" tabindex="0">プリンキピア</span>　［制作中］</li>
+    </ul>
+
+    <h2>1689</h2>
+    <ul>
+      <li><span class="item" data-key="oku_no_hosomichi" tabindex="0">奥の細道</span>　［制作中］</li>
+    </ul>
+
+    <h2>1781</h2>
+    <ul>
+      <li><span class="item" data-key="critique_pure_reason" tabindex="0">純粋理性批判</span>　［制作中］</li>
+    </ul>
+
+    <h2>1807</h2>
+    <ul>
+      <li><span class="item" data-key="phenomenology_spirit" tabindex="0">精神現象学</span>　［制作中］</li>
+    </ul>
+
+    <h2>1859</h2>
+    <ul>
+      <li><span class="item" data-key="origin_species" tabindex="0">種の起源</span>　［制作中］</li>
+    </ul>
+
+    <h2>1906</h2>
+    <ul>
+      <li><span class="item" data-key="book_of_tea" tabindex="0">茶の本</span>　［制作中］</li>
+    </ul>
+
+    <h2>1921</h2>
+    <ul>
+      <li><span class="item" data-key="tractatus" tabindex="0">論理哲学論考</span>　［制作中］</li>
+    </ul>
+
+    <h2>1927</h2>
+    <ul>
+      <li><span class="item" data-key="being_time" tabindex="0">存在と時間</span>　［制作中］</li>
+    </ul>
+
+    <h2>1929</h2>
+    <ul>
+      <li><span class="item" data-key="process_reality" tabindex="0">過程と実在</span>　［制作中］</li>
+    </ul>
+
+    <h2>1944</h2>
+    <ul>
+      <li><span class="item" data-key="what_is_life" tabindex="0">生命とは何か</span>　［制作中］</li>
+    </ul>
+
+    <h2>1945</h2>
+    <ul>
+      <li><span class="item" data-key="phenomenology_perception" tabindex="0">知覚の現象学</span>　［制作中］</li>
+    </ul>
+
+    <h2>1948</h2>
+    <ul>
+      <li><span class="item" data-key="cybernetics" tabindex="0">サイバネティクス</span>　［制作中］</li>
+    </ul>
+
+    <h2>1953</h2>
+    <ul>
+      <li><span class="item" data-key="philosophical_investigations" tabindex="0">哲学探究</span>　［制作中］</li>
+    </ul>
+
+    <h2 id="last">1962</h2>
+    <ul>
+      <li><span class="item" data-key="structure_scientific_revolutions" tabindex="0">科学革命の構造</span>　［制作中］</li>
+    </ul>
+  </main>
+
+  <aside class="note" id="note" aria-live="polite"></aside>
+
+  <script src="./notes.js"></script>
+  <script>
+  (() => {
+    const box = document.getElementById('note');
+    const NOTES = window.NOTES || {};
+
+    // ===== 距離しきい値（px） =====
+    const LIMIT_HIDE  = 70;   // この距離までは「戻る」
+    const LIMIT_CLEAR = 180;  // この距離を超えたら「消える」
+
+    // ===== 動きの量（見た目） =====
+    const MAX_Y = 18;         // 隠れるときの沈み量（px）
+
+    // ===== 状態 =====
+    let activeEl = null;
+    let activeKey = null;
+
+    // ポインタ位置
+    let px = 0, py = 0;
+    let hasPointer = false;
+
+    // スムージング
+    let curOpacity = 0;
+    let curY = MAX_Y;
+    const SMOOTH = 0.18;
+
+    const isMobile = () => matchMedia('(max-width: 720px)').matches;
+
+    function hideVisually() {
+      curOpacity = 0;
+      curY = MAX_Y;
+      box.style.opacity = '0';
+      box.style.transform = `translateY(${MAX_Y}px)`;
+    }
+
+    function clearBox() {
+      activeEl = null;
+      activeKey = null;
+      box.textContent = '';
+      hideVisually();
+    }
+
+    function render(key) {
+      const obj = NOTES[key];
+      if (!obj) {
+        clearBox();
+        return;
+      }
+      box.innerHTML = '';
+
+      const t = document.createElement('div');
+      t.className = 't';
+      t.textContent = obj.title || '';
+
+      const n = document.createElement('div');
+      n.textContent = obj.note || '';
+
+      box.appendChild(t);
+      box.appendChild(n);
+    }
+
+    // 矩形とポイントの距離（矩形内は0）
+    function distancePointToRect(x, y, rect) {
+      const dx = (x < rect.left) ? (rect.left - x) : (x > rect.right) ? (x - rect.right) : 0;
+      const dy = (y < rect.top)  ? (rect.top - y)  : (y > rect.bottom)? (y - rect.bottom) : 0;
+      return Math.hypot(dx, dy);
+    }
+
+    // 右上固定：hr の直下へ（スマホは下固定なので触らない）
+    function positionNote() {
+      if (isMobile()) return; // 下固定
+      const hr = document.querySelector('main hr');
+      if (!hr) return;
+      const r = hr.getBoundingClientRect();
+      const top = Math.max(12, Math.round(r.bottom + 10));
+      box.style.top = top + 'px';
+    }
+
+    positionNote();
+    addEventListener('scroll', positionNote, { passive:true });
+    addEventListener('resize', positionNote);
+
+    addEventListener('pointermove', (e) => {
+      px = e.clientX;
+      py = e.clientY;
+      hasPointer = true;
+    }, { passive:true });
+
+    function activate(el) {
+      const key = el.getAttribute('data-key');
+      if (!key) return;
+
+      if (activeEl === el && activeKey === key) return;
+
+      activeEl = el;
+      activeKey = key;
+      render(key);
+
+      // いったん「見える」方向へ寄せる（初回の無表示を防ぐ）
+      curOpacity = Math.max(curOpacity, 0.95);
+      curY = Math.min(curY, 4);
+      box.style.opacity = String(curOpacity);
+      box.style.transform = `translateY(${curY}px)`;
+    }
+
+    // hover/focusで発火。消すのは距離で決める
+    document.querySelectorAll('main .item[data-key]').forEach(el => {
+      el.addEventListener('mouseenter', () => activate(el));
+      el.addEventListener('focus', () => activate(el));
+    });
+
+    function tick() {
+      requestAnimationFrame(tick);
+      if (!activeEl || !activeKey) return;
+
+      let dist = 0;
+      if (hasPointer) {
+        const rect = activeEl.getBoundingClientRect();
+        dist = distancePointToRect(px, py, rect);
+      }
+
+      let targetOpacity, targetY;
+
+      if (dist <= LIMIT_HIDE) {
+        targetOpacity = 1;
+        targetY = 0;
+      } else if (dist >= LIMIT_CLEAR) {
+        clearBox();
+        return;
+      } else {
+        const p = (dist - LIMIT_HIDE) / (LIMIT_CLEAR - LIMIT_HIDE); // 0..1
+        targetOpacity = 1 - p;
+        targetY = p * MAX_Y;
+      }
+
+      curOpacity += (targetOpacity - curOpacity) * SMOOTH;
+      curY       += (targetY       - curY)       * SMOOTH;
+
+      box.style.opacity = String(curOpacity);
+      box.style.transform = `translateY(${curY.toFixed(2)}px)`;
+    }
+
+    clearBox();
+    positionNote();
+    tick();
+  })();
+  </script>
+</body>
+</html>
